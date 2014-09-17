@@ -13,6 +13,10 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
         super(skin, drawableName);
     }
 
+    public GameObject() {
+        super();
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);

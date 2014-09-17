@@ -7,14 +7,19 @@ import aurelienribon.tweenengine.TweenManager;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.util.CardMover;
+import com.jjjackson.konchinka.util.PlayerUtil;
 import com.jjjackson.konchinka.util.PositionCalculator;
 
-import java.awt.*;
+import java.util.List;
+import java.util.Random;
 
 public class PackHandler extends GameObjectHandler {
 
     private boolean isCardMoving;
     private CardMover cardMover;
+    private boolean isMovementInit;
+    private float jackX;
+    private float jackY;
 
     public PackHandler(GameModel model, TweenManager tweenManager) {
         super(model, tweenManager);
@@ -57,7 +62,18 @@ public class PackHandler extends GameObjectHandler {
     }
 
     private void movePackOut() {
+        Tween.to(this.model.pack, GameObject.POSITION_XY, 0.4f).
+                target(GameConstants.PACK_X, GameConstants.PACK_BOTTOM_HIDE_Y).
+                start(this.tweenManager).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        if (type != COMPLETE) return;
 
+                        model.states.deal = DealState.NONE;
+                        model.states.game = GameState.NEXT_TURN;
+                    }
+                });
     }
 
     private void dealCards() {
@@ -71,10 +87,10 @@ public class PackHandler extends GameObjectHandler {
                 return;
             }
             this.movingCard = this.model.cards.remove(0);
-            initStartPosition(this.movingCard);
+            initStartPosition(this.movingCard, (int) this.model.pack.getX(), (int) this.model.pack.getY());
             initEndPosition(this.movingCard);
             this.isCardMoving = true;
-        } else {
+        } else if (!this.isMovementInit) {
             Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
                     target(this.movingCard.endX, this.movingCard.endY).
                     start(this.tweenManager).
@@ -84,30 +100,19 @@ public class PackHandler extends GameObjectHandler {
                             if (type != COMPLETE) return;
 
                             isCardMoving = false;
+                            isMovementInit = false;
                             CardHolder cardHolder = getCurrentPlayer();
                             cardHolder.playCards.add(movingCard);
-                            switchPlayer();
+                            PlayerUtil.switchPlayer(model);
                         }
                     });
+            this.isMovementInit = true;
         }
     }
 
-    private void switchPlayer() {
-        int playersNumber = this.model.cardHolders.size();
-        for (int i = 0; i < playersNumber; i++) {
-            CardHolder cardHolder = this.model.cardHolders.get(i);
-            if (cardHolder.isCurrent) {
-                cardHolder.isCurrent = false;
-                int nextPlayerIndex = i == playersNumber - 1 ? 0 : ++i;
-                CardHolder nextPlayer = this.model.cardHolders.get(nextPlayerIndex);
-                nextPlayer.isCurrent = true;
-            }
-        }
-    }
-
-    private void initStartPosition(Card card) {
-        card.setX(this.model.pack.getX());
-        card.setY(this.model.pack.getY());
+    private void initStartPosition(Card card, int x, int y) {
+        card.setX(x);
+        card.setY(y);
     }
 
     private void initEndPosition(Card card) {
@@ -154,11 +159,78 @@ public class PackHandler extends GameObjectHandler {
         return this.model.cardHolders.get(this.model.cardHolders.size() - 1).playCards.size() == 4;
     }
 
-    private void moveJackIn() {
+    private void moveJackOut() {
+        if (!this.isCardMoving) {
+            this.movingCard = this.model.cards.remove(0);
+            initStartPosition(this.movingCard, (int) this.model.pack.getX(), (int) this.model.pack.getY());
+            initJackEndPosition(this.movingCard, this.jackX, this.jackY);
+            this.isCardMoving = true;
+        } else if (!this.isMovementInit) {
+            Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
+                    target(this.movingCard.endX, this.movingCard.endY).
+                    start(this.tweenManager).
+                    setCallback(new TweenCallback() {
+                        @Override
+                        public void onEvent(int type, BaseTween<?> source) {
+                            if (type != COMPLETE) return;
+
+                            model.states.deal = DealState.DEAL;
+                            isCardMoving = false;
+                            isMovementInit = false;
+                            model.table.playCards.add(movingCard);
+                        }
+                    });
+            this.isMovementInit = true;
+        }
 
     }
 
-    private void moveJackOut() {
+    private void moveJackIn() {
+        if (!this.isCardMoving) {
+            Card jack = getJack(this.model.table.playCards);
+            this.jackX = jack.getX();
+            this.jackY = jack.getY();
+            this.movingCard = jack;
+            initJackEndPosition(jack, this.model.pack.getX(), this.model.pack.getY());
+            this.isCardMoving = true;
+        } else if (!this.isMovementInit) {
+            Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
+                    target(this.movingCard.endX, this.movingCard.endY).
+                    start(this.tweenManager).
+                    setCallback(new TweenCallback() {
+                        @Override
+                        public void onEvent(int type, BaseTween<?> source) {
+                            if (type != COMPLETE) return;
 
+                            model.states.deal = DealState.JACK_OUT;
+                            isCardMoving = false;
+                            isMovementInit = false;
+                            model.cards.add(getRandomPosition(10, 30), movingCard);
+                            model.table.playCards.remove(movingCard);
+                            movingCard.setX(-100);
+                            movingCard.setY(-100);
+                        }
+                    });
+            this.isMovementInit = true;
+        }
+
+    }
+
+    private int getRandomPosition(int from, int to) {
+        return to - new Random().nextInt(to - from);
+    }
+
+    private Card getJack(List<Card> cards) {
+        for (Card card : cards) {
+            if (card.value == GameConstants.JACK_VALUE) {
+                return card;
+            }
+        }
+        return null;
+    }
+
+    private void initJackEndPosition(Card jack, float x, float y) {
+        jack.endX = (int) x;
+        jack.endY = (int) y;
     }
 }

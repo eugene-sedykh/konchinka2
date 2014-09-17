@@ -29,7 +29,7 @@ public class GameScreen implements Screen {
         this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/cards.pack")));
         GameModel gameModel = initModel();
         this.gameController = new GameController(gameModel);
-        this.gameRenderer = new GameRenderer(this.gameController.model, this.stage);
+        this.gameRenderer = new GameRenderer(this.gameController.model, this.stage, this.skin);
     }
 
     private GameModel initModel() {
@@ -49,10 +49,10 @@ public class GameScreen implements Screen {
 
     private void initCards(GameModel gameModel) {
         for (int i = 1; i < 14; i++) {
-            gameModel.cards.add(new Card(this.skin, CardSuit.CLUBS, i));
-            gameModel.cards.add(new Card(this.skin, CardSuit.DIAMONDS, i));
-            gameModel.cards.add(new Card(this.skin, CardSuit.HEARTS, i));
-            gameModel.cards.add(new Card(this.skin, CardSuit.SPADES, i));
+            gameModel.cards.add(new Card(CardSuit.CLUBS, 11, this.skin));
+            gameModel.cards.add(new Card(CardSuit.DIAMONDS, i, this.skin));
+            gameModel.cards.add(new Card(CardSuit.HEARTS, i, this.skin));
+            gameModel.cards.add(new Card(CardSuit.SPADES, i, this.skin));
         }
         Collections.shuffle(gameModel.cards);
     }

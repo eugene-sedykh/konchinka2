@@ -1,5 +1,7 @@
 package com.jjjackson.konchinka.domain;
 
+import com.jjjackson.konchinka.handler.GameObjectHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,5 +13,5 @@ public class GameModel {
     public List<User> opponents = new ArrayList<>();
     public User player;
     public List<CardHolder> cardHolders;
-    public int currentPlayerIndex;
+    public CardHolder currentPlayer;
 }

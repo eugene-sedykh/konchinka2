@@ -25,7 +25,7 @@ public class CardMover {
             int x = 240 - (GameConstants.CARD_WIDTH + 4) * getRowSize(addPlaceholder, size, row, rows) / 2 +
                     indexInRow * (GameConstants.CARD_WIDTH + 4);
             card.setX(x);
-            int y = 225 + ((row - 1) * (GameConstants.CARD_HEIGHT + GameConstants.TABLE_CARDS_GAP));
+            int y = 475 - ((row - 1) * (GameConstants.CARD_HEIGHT + GameConstants.TABLE_CARDS_GAP));
             card.setY(y);
             if (shiftVertically) {
                 card.setY(card.getY() + (GameConstants.CARD_HEIGHT + GameConstants.TABLE_CARDS_GAP) / 2);
