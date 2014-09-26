@@ -14,4 +14,5 @@ public class GameModel {
     public User player;
     public List<CardHolder> cardHolders;
     public CardHolder currentPlayer;
+    public CardPosition dealerPosition;
 }

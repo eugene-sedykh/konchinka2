@@ -40,7 +40,6 @@ public class GameRenderer {
             showJacksBack(this.model.cards);
         }
 
-
         this.stage.act(delta);
         this.stage.draw();
     }

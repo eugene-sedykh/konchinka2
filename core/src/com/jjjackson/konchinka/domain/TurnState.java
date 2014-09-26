@@ -15,5 +15,6 @@ public enum TurnState {
     SORT_CARDS_IN,
     TRICK_CARDS_OUT,
     TRICK_CARDS_PRESS,
+    NONE,
     MOVE_PLAY_CARD
 }

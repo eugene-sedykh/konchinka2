@@ -13,6 +13,8 @@ import com.jjjackson.konchinka.domain.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class GameScreen implements Screen {
 
@@ -37,7 +39,8 @@ public class GameScreen implements Screen {
         gameModel.states = new States();
         initPack(gameModel);
         initCards(gameModel);
-        initPlayers(gameModel, 4);
+        gameModel.dealerPosition = CardPosition.RIGHT;
+        initPlayers(gameModel, 4, gameModel.dealerPosition);
         return gameModel;
     }
 
@@ -49,7 +52,7 @@ public class GameScreen implements Screen {
 
     private void initCards(GameModel gameModel) {
         for (int i = 1; i < 14; i++) {
-            gameModel.cards.add(new Card(CardSuit.CLUBS, 11, this.skin));
+            gameModel.cards.add(new Card(CardSuit.CLUBS, i, this.skin));
             gameModel.cards.add(new Card(CardSuit.DIAMONDS, i, this.skin));
             gameModel.cards.add(new Card(CardSuit.HEARTS, i, this.skin));
             gameModel.cards.add(new Card(CardSuit.SPADES, i, this.skin));
@@ -57,7 +60,7 @@ public class GameScreen implements Screen {
         Collections.shuffle(gameModel.cards);
     }
 
-    private void initPlayers(GameModel model, int playersNumber) {
+    private void initPlayers(GameModel model, int playersNumber, final CardPosition dealerPosition) {
         model.table = new Table();
         switch (playersNumber) {
             case 2:
@@ -72,13 +75,31 @@ public class GameScreen implements Screen {
                 model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP));
                 model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT));
         }
-        model.opponents.get(0).isCurrent = true;
         model.player = new User(UserType.PLAYER, CardPosition.BOTTOM);
 
         model.cardHolders = new ArrayList<>();
         model.cardHolders.addAll(model.opponents);
-        model.cardHolders.add(model.table);
         model.cardHolders.add(model.player);
+
+        sort(model.cardHolders, dealerPosition);
+
+        model.cardHolders.add(model.cardHolders.size() - 1, model.table);
+
+        model.cardHolders.get(0).isCurrent = true;
+    }
+
+    private void sort(List<CardHolder> cardHolders, CardPosition dealerPosition) {
+        int dealerIndex = getDealerIndex(cardHolders, dealerPosition);
+        Collections.rotate(cardHolders, cardHolders.size() - dealerIndex - 1);
+    }
+
+    private int getDealerIndex(List<CardHolder> cardHolders, CardPosition dealerPosition) {
+        for (int i = 0; i < cardHolders.size(); i++) {
+            if (cardHolders.get(i).cardPosition == dealerPosition) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     @Override
