@@ -1,6 +1,7 @@
 package com.jjjackson.konchinka;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -56,6 +57,7 @@ public class GameRenderer {
     private void showCardsFace(List<Card> cards) {
         for (Card card : cards) {
             card.setDrawable(this.skin, card.face);
+            if (card.isMarked) card.setColor(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b, 0.3f);
             card.pack();
         }
     }

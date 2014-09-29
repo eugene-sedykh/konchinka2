@@ -12,6 +12,7 @@ public class Card extends GameObject {
     public int endY;
     public boolean showFace = true;
     public String face;
+    public boolean isMarked;
 
     public Card(CardSuit cardSuit, int value, Skin skin) {
         super(skin, "b1fv");
