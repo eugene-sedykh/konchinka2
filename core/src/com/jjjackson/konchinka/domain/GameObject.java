@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 public abstract class GameObject extends Image implements TweenAccessor<GameObject> {
 
     public static final int POSITION_XY = 1;
+    public static final int ROTATION_XY = 2;
 
     public GameObject(Skin skin, String drawableName) {
         super(skin, drawableName);
@@ -29,6 +30,11 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
                 returnValues[0] = gameObject.getX();
                 returnValues[1] = gameObject.getY();
                 return 2;
+            case ROTATION_XY:
+                returnValues[0] = gameObject.getX();
+                returnValues[1] = gameObject.getY();
+                returnValues[2] = gameObject.getRotation();
+                return 3;
             default:
                 assert false; return -1;
         }
@@ -40,6 +46,11 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
             case POSITION_XY:
                 gameObject.setX(returnValues[0]);
                 gameObject.setY(returnValues[1]);
+                break;
+            case ROTATION_XY:
+                gameObject.setX(returnValues[0]);
+                gameObject.setY(returnValues[1]);
+                gameObject.setRotation(returnValues[2]);
                 break;
             default:
                 assert false; break;

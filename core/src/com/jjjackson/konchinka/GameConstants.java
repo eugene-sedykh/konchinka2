@@ -8,8 +8,8 @@ public class GameConstants {
     public static final int PLAY_CARD_X = 205;
     public static final int PLAY_CARD_Y = 225;
 
-    public static final int BOTTOM_BOARD_X = 289;
-    public static final int BOTTOM_BOARD_Y = 300;
+    public static final int BOTTOM_BOARD_X = 288;
+    public static final int BOTTOM_BOARD_Y = 130;
 
     public static final int TOP_BOARD_Y = 125;
 

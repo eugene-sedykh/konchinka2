@@ -57,7 +57,11 @@ public class GameRenderer {
     private void showCardsFace(List<Card> cards) {
         for (Card card : cards) {
             card.setDrawable(this.skin, card.face);
-            if (card.isMarked) card.setColor(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b, 0.3f);
+            if (card.isMarked) {
+                card.setColor(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b, 0.8f);
+            } else {
+                card.setColor(Color.WHITE);
+            }
             card.pack();
         }
     }
