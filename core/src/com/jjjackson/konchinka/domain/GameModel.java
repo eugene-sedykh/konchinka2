@@ -15,4 +15,5 @@ public class GameModel {
     public List<CardHolder> cardHolders;
     public CardHolder currentPlayer;
     public CardPosition dealerPosition;
+    public Buttons buttons = new Buttons();
 }
