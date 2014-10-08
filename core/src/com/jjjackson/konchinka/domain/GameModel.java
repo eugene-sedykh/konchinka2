@@ -1,5 +1,6 @@
 package com.jjjackson.konchinka.domain;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.jjjackson.konchinka.handler.GameObjectHandler;
 
 import java.util.ArrayList;
@@ -16,4 +17,5 @@ public class GameModel {
     public CardHolder currentPlayer;
     public CardPosition dealerPosition;
     public Buttons buttons = new Buttons();
+    public Image sortFog;
 }

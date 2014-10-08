@@ -6,11 +6,15 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.DealState;
 import com.jjjackson.konchinka.domain.GameModel;
+import com.jjjackson.konchinka.listener.SortButtonListener;
 
 import java.util.List;
 
@@ -33,7 +37,22 @@ public class GameRenderer {
         }
 
         initGameButtons(this.stage);
+        initSortFog(this.stage);
+    }
 
+    private void initSortFog(Stage stage) {
+        Drawable drawable = new BaseDrawable();
+        drawable.setMinWidth(Gdx.graphics.getWidth());
+        drawable.setMinHeight(Gdx.graphics.getHeight());
+        Image fog = new Image(drawable);
+//        fog.setWidth(Gdx.graphics.getWidth());
+//        fog.setHeight(Gdx.graphics.getHeight());
+        fog.setColor(Color.GRAY);
+        fog.setVisible(false);
+        fog.setFillParent(true);
+        fog.pack();
+        this.model.sortFog = fog;
+        stage.addActor(fog);
     }
 
     private void initGameButtons(Stage stage) {
@@ -42,6 +61,7 @@ public class GameRenderer {
         TextButton endSortButton = createButton("Done", textButtonStyle, 100, 150);
         TextButton trickButton = createButton("Trick", textButtonStyle, 380, 150);
         TextButton endButton = createButton("End", textButtonStyle, 380, 150);
+        sortButton.addListener(new SortButtonListener(this.model));
         stage.addActor(sortButton);
         stage.addActor(endSortButton);
         stage.addActor(trickButton);

@@ -165,6 +165,7 @@ public class PlayerHandler extends GameObjectHandler {
                         removeListeners(combinedCards);
                         turnCombinedCards.addAll(combinedCards);
                         combinedCards.clear();
+                        model.buttons.sortButton.setVisible(true);
                     }
                 });
     }
