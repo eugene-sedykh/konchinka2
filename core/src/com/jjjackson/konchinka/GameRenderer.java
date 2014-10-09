@@ -6,13 +6,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.DealState;
+import com.jjjackson.konchinka.domain.Fog;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.listener.SortButtonListener;
 
@@ -41,17 +39,9 @@ public class GameRenderer {
     }
 
     private void initSortFog(Stage stage) {
-        Drawable drawable = new BaseDrawable();
-        drawable.setMinWidth(Gdx.graphics.getWidth());
-        drawable.setMinHeight(Gdx.graphics.getHeight());
-        Image fog = new Image(drawable);
-//        fog.setWidth(Gdx.graphics.getWidth());
-//        fog.setHeight(Gdx.graphics.getHeight());
-        fog.setColor(Color.GRAY);
+        Fog fog = new Fog();
         fog.setVisible(false);
-        fog.setFillParent(true);
-        fog.pack();
-        this.model.sortFog = fog;
+        this.model.fog = fog;
         stage.addActor(fog);
     }
 
