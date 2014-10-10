@@ -294,6 +294,7 @@ public class PlayerHandler extends GameObjectHandler {
                         turnCombinedCards.add(card);
                         model.player.boardCards.add(card);
                         removeListeners(Collections.singletonList(card));
+                        model.buttons.sortButton.setVisible(true);
                     }
                 });
     }
