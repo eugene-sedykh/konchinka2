@@ -18,4 +18,5 @@ public class GameModel {
     public Buttons buttons = new Buttons();
     public Fog fog;
     public Group fogGroup;
+    public Card playCard;
 }

@@ -7,6 +7,7 @@ import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.domain.User;
 
+import java.util.Collections;
 import java.util.List;
 
 public class SortButtonListener extends ClickListener {
@@ -36,6 +37,9 @@ public class SortButtonListener extends ClickListener {
         for (User opponent : this.model.opponents) {
             enableCards(opponent.boardCards);
         }
+        if (this.model.playCard != null) {
+            enableCards(Collections.singletonList(this.model.playCard));
+        }
     }
 
     private void enableCards(List<Card> cards) {
@@ -49,7 +53,9 @@ public class SortButtonListener extends ClickListener {
         for (User opponent : this.model.opponents) {
             disableCards(opponent.boardCards);
         }
-        //todo: disable play card if not combined
+        if (this.model.playCard != null) {
+            disableCards(Collections.singletonList(this.model.playCard));
+        }
     }
 
     private void disableCards(List<Card> cards) {

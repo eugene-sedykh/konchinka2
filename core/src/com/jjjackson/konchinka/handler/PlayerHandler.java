@@ -70,7 +70,7 @@ public class PlayerHandler extends GameObjectHandler {
                             addSingleClickListener(getCardsHeap());
                         }
                         addPlayCardListener(card);
-
+                        model.playCard = card;
                         playCardValue = card.value;
                     }
                 });
@@ -88,8 +88,8 @@ public class PlayerHandler extends GameObjectHandler {
                             @Override
                             public void onEvent(int type, BaseTween<?> source) {
                                 if (type != COMPLETE) return;
-
                                 turnCombinedCards.add(card);
+                                model.playCard = null;
                             }
                         });
             }
