@@ -65,7 +65,7 @@ public class SortButtonListener extends ClickListener {
     }
 
     private void moveSortedCards() {
-        for (Card card : this.model.table.playCards) {
+        for (Card card : this.model.turnCombinedCards) {
 //            card.set
         }
 

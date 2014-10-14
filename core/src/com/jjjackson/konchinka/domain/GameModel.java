@@ -1,7 +1,5 @@
 package com.jjjackson.konchinka.domain;
 
-import com.badlogic.gdx.scenes.scene2d.Group;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +15,6 @@ public class GameModel {
     public CardPosition dealerPosition;
     public Buttons buttons = new Buttons();
     public Fog fog;
-    public Group fogGroup;
     public Card playCard;
+    public List<Card> turnCombinedCards = new ArrayList<>();
 }

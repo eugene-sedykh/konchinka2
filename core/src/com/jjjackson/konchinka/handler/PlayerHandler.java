@@ -18,7 +18,6 @@ public class PlayerHandler extends GameObjectHandler {
 
     private int playCardValue;
     private List<Card> combinedCards = new ArrayList<>();
-    private List<Card> turnCombinedCards = new ArrayList<>();
 
     public PlayerHandler(GameModel model, TweenManager tweenManager) {
         super(model, tweenManager);
@@ -88,7 +87,7 @@ public class PlayerHandler extends GameObjectHandler {
                             @Override
                             public void onEvent(int type, BaseTween<?> source) {
                                 if (type != COMPLETE) return;
-                                turnCombinedCards.add(card);
+                                model.turnCombinedCards.add(card);
                                 model.playCard = null;
                             }
                         });
@@ -163,7 +162,7 @@ public class PlayerHandler extends GameObjectHandler {
                     public void onEvent(int i, BaseTween<?> baseTween) {
                         model.player.boardCards.addAll(combinedCards);
                         removeListeners(combinedCards);
-                        turnCombinedCards.addAll(combinedCards);
+                        model.turnCombinedCards.addAll(combinedCards);
                         combinedCards.clear();
                         model.buttons.sortButton.setVisible(true);
                     }
@@ -291,7 +290,7 @@ public class PlayerHandler extends GameObjectHandler {
                         if (type != COMPLETE) return;
 
                         combinedCards.remove(card);
-                        turnCombinedCards.add(card);
+                        model.turnCombinedCards.add(card);
                         model.player.boardCards.add(card);
                         removeListeners(Collections.singletonList(card));
                         model.buttons.sortButton.setVisible(true);
