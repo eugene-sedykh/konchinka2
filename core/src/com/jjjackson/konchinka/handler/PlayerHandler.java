@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.listener.SortButtonListener;
 import com.jjjackson.konchinka.util.PlayerUtil;
 import com.jjjackson.konchinka.util.PositionCalculator;
 
@@ -28,6 +29,7 @@ public class PlayerHandler extends GameObjectHandler {
         switch (this.model.states.turn) {
             case NONE:
                 addPlayCardListeners(this.model.player.playCards);
+                model.buttons.sortButton.addListener(new SortButtonListener(this.model, tweenManager, this.cardMover));
                 this.model.states.turn = TurnState.WAIT;
                 break;
         }
@@ -88,6 +90,7 @@ public class PlayerHandler extends GameObjectHandler {
                             public void onEvent(int type, BaseTween<?> source) {
                                 if (type != COMPLETE) return;
                                 model.turnCombinedCards.add(card);
+                                card.getListeners().clear();
                                 model.playCard = null;
                             }
                         });
@@ -165,6 +168,7 @@ public class PlayerHandler extends GameObjectHandler {
                         model.turnCombinedCards.addAll(combinedCards);
                         combinedCards.clear();
                         model.buttons.sortButton.setVisible(true);
+                        centerTableCards();
                     }
                 });
     }
@@ -182,6 +186,12 @@ public class PlayerHandler extends GameObjectHandler {
 
                     }
                 });
+    }
+
+    private void centerTableCards() {
+        List<Card> cards = this.model.table.playCards;
+        cards.removeAll(this.model.turnCombinedCards);
+        cardMover.changeCenterCardsPosition(cards, false);
     }
 
     private void unmark(List<Card> combinedCards) {
@@ -294,6 +304,7 @@ public class PlayerHandler extends GameObjectHandler {
                         model.player.boardCards.add(card);
                         removeListeners(Collections.singletonList(card));
                         model.buttons.sortButton.setVisible(true);
+                        centerTableCards();
                     }
                 });
     }

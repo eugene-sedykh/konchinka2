@@ -12,7 +12,6 @@ import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.DealState;
 import com.jjjackson.konchinka.domain.Fog;
 import com.jjjackson.konchinka.domain.GameModel;
-import com.jjjackson.konchinka.listener.SortButtonListener;
 
 import java.util.List;
 
@@ -51,7 +50,6 @@ public class GameRenderer {
         TextButton endSortButton = createButton("Done", textButtonStyle, 100, 150);
         TextButton trickButton = createButton("Trick", textButtonStyle, 380, 150);
         TextButton endButton = createButton("End", textButtonStyle, 380, 150);
-        sortButton.addListener(new SortButtonListener(this.model));
         stage.addActor(sortButton);
         stage.addActor(endSortButton);
         stage.addActor(trickButton);

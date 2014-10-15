@@ -25,11 +25,17 @@ public class PositionCalculator {
         destination.y = 400 - cardNumber * 25;
     }
 
-    public static void calcCenter(int cardNumber, Point destination) {
+    public static void calcCenter(int cardNumber, Point destination, boolean shiftVertically) {
         int cardsInRow = cardNumber % 4;
         destination.x = 240 - (cardsInRow + 1) * (GameConstants.CARD_WIDTH + GameConstants.TABLE_CARDS_GAP) / 2 +
                 (cardsInRow) * (GameConstants.CARD_WIDTH + GameConstants.TABLE_CARDS_GAP);
         destination.y = 475 - (cardNumber / 4 * (GameConstants.CARD_HEIGHT + GameConstants.TABLE_CARDS_GAP));
+        if (shiftVertically) {
+            destination.y = (destination.y - (GameConstants.CARD_HEIGHT + GameConstants.TABLE_CARDS_GAP) / 2);
+        }
     }
 
+    public static void calcCenter(int cardNumber, Point destination) {
+        calcCenter(cardNumber, destination, false);
+    }
 }
