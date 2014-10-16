@@ -177,15 +177,7 @@ public class PlayerHandler extends GameObjectHandler {
         card.toFront();
         return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
                 target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
-                start(this.tweenManager).
-                setCallback(new TweenCallback() {
-                    @Override
-                    public void onEvent(int type, BaseTween<?> source) {
-                        if (type != COMPLETE) return;
-
-
-                    }
-                });
+                start(this.tweenManager);
     }
 
     private void centerTableCards() {

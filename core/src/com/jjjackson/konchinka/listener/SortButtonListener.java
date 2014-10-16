@@ -1,10 +1,13 @@
 package com.jjjackson.konchinka.listener;
 
-import aurelienribon.tweenengine.*;
-import com.badlogic.gdx.Gdx;
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.util.CardMover;
 import com.jjjackson.konchinka.util.PositionCalculator;
@@ -28,14 +31,13 @@ public class SortButtonListener extends ClickListener {
     @Override
     public void clicked(InputEvent event, float x, float y) {
         if (this.model.fog.isVisible()) {
-            this.model.fog.setVisible(false);
-            enableCards();
             moveSortedCards();
         } else {
             disableCards();
             this.model.fog.setVisible(true);
             this.model.fog.toFront();
             this.model.buttons.sortButton.toFront();
+            this.model.buttons.sortButton.setTouchable(Touchable.disabled);
             moveCardsToSort();
         }
     }
@@ -73,53 +75,95 @@ public class SortButtonListener extends ClickListener {
     }
 
     private void moveSortedCards() {
+        if (!this.sortCards.isEmpty()) {
+            Card card = this.sortCards.remove(this.sortCards.size() - 1);
+            card.getListeners().clear();
+            Tween tween = initBackToPlayerTween(card);
+            this.model.turnCombinedCards.add(card);
+            tween.start(this.tweenManager);
+        } else {
+            endSorting();
+        }
+    }
 
+    private Tween initBackToPlayerTween(Card card) {
+            card.toFront();
+            return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+                    target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
+                    start(this.tweenManager).
+                    setCallbackTriggers(TweenCallback.COMPLETE).
+                    setCallback(new TweenCallback() {
+                        @Override
+                        public void onEvent(int type, BaseTween<?> source) {
+                            if (!sortCards.isEmpty()) {
+                                cardMover.changeCenterCardsPosition(sortCards, true, true);
+                            }
+
+                            moveSortedCards();
+                        }
+                    });
     }
 
     private void moveCardsToSort() {
-        Timeline sequence = Timeline.createSequence();
-        for (int i = 0; i < this.model.turnCombinedCards.size(); i++) {
-            Card card = this.model.turnCombinedCards.get(i);
-            sequence.push(initTween(card, i + 1));
+        if (!this.model.turnCombinedCards.isEmpty()) {
+            Card card = this.model.turnCombinedCards.remove(this.model.turnCombinedCards.size() - 1);
+            Tween tween = initTween(card);
+            this.sortCards.add(card);
+            tween.start(this.tweenManager);
+        } else {
+            this.model.buttons.sortButton.setTouchable(Touchable.enabled);
         }
-        sequence.start(this.tweenManager).
+    }
+
+    private Tween initTween(final Card card) {
+        card.toFront();
+        Point destination = new Point();
+        this.cardMover.changeCenterCardsPosition(sortCards, true, true);
+
+        PositionCalculator.calcCenter(this.sortCards.size(), destination, true);
+        card.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                moveCardToPlayer(card);
+            }
+        });
+        return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+                target(destination.x, destination.y, 0).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
                     @Override
-                    public void onEvent(int i, BaseTween<?> baseTween) {
-//                        model.player.boardCards.addAll(combinedCards);
-//                        removeListeners(combinedCards);
-//                        model.turnCombinedCards.addAll(combinedCards);
-//                        combinedCards.clear();
-//                        model.buttons.sortButton.setVisible(true);
-//                        centerTableCards();
+                    public void onEvent(int type, BaseTween<?> source) {
+                        moveCardsToSort();
                     }
                 });
     }
 
-    private Tween initTween(final Card card, int i) {
-        card.toFront();
-        Point destination = new Point();
-        PositionCalculator.calcCenter(i, destination, true);
-        return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
-                target(destination.x, destination.y, 0).
-                start(this.tweenManager).
-                setCallback(new TweenCallback() {
-                    @Override
-                    public void onEvent(int type, BaseTween<?> source) {
-                        if (type == COMPLETE) {
-                            card.addListener(new ClickListener() {
-                                @Override
-                                public void clicked(InputEvent event, float x, float y) {
-                                    Gdx.app.log("blabla", "blablabla");
-                                }
-                            });
+    private void moveCardToPlayer(Card card) {
+        card.getListeners().clear();
+        initMovement(card);
+        this.model.turnCombinedCards.add(card);
+        this.sortCards.remove(card);
+    }
 
-                        } else if (type == START){
-                            cardMover.changeCenterCardsPosition(sortCards, true, true);
-                            sortCards.add(card);
-                        }
+    private void initMovement(Card card) {
+        card.toFront();
+        Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+            target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
+            setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                @Override
+                public void onEvent(int type, BaseTween<?> source) {
+                    if (!sortCards.isEmpty()) {
+                        cardMover.changeCenterCardsPosition(sortCards, false, true);
+                    } else {
+                        endSorting();
                     }
-                });
+                }
+            }).start(this.tweenManager);
+    }
+
+    private void endSorting() {
+        this.model.fog.setVisible(false);
+        enableCards();
     }
 }
