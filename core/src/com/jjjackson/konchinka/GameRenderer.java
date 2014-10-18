@@ -103,6 +103,7 @@ public class GameRenderer {
 
     private void showCardsFace(List<Card> cards) {
         for (Card card : cards) {
+            if (this.model.player.tricks.contains(card)) return;
             card.setDrawable(this.skin, card.face);
             if (card.isMarked) {
                 card.setColor(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b, 0.8f);

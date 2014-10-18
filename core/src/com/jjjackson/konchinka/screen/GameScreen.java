@@ -29,6 +29,7 @@ public class GameScreen implements Screen {
         this.skin = new Skin();
         this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/cards.pack")));
         GameModel gameModel = initModel();
+        gameModel.skin = this.skin;
         this.gameController = new GameController(gameModel);
         this.gameRenderer = new GameRenderer(this.gameController.model, this.stage, this.skin);
     }

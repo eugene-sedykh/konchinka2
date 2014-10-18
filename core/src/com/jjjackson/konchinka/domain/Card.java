@@ -7,7 +7,7 @@ import com.jjjackson.konchinka.GameConstants;
 public class Card extends GameObject {
 
     public final CardSuit cardSuit;
-    public final int value;
+    public int value;
     public int endX;
     public int endY;
     public boolean showFace = true;

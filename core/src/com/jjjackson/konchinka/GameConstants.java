@@ -28,7 +28,7 @@ public class GameConstants {
     public static final int JACK_VALUE = 11;
 
     public static final int BOTTOM_TRICK_X = 10;
-    public static final int BOTTOM_TRICK_Y = 704;
+    public static final int BOTTOM_TRICK_Y = 0;
     public static final int LEFT_TRICK_X = 0;
     public static final int LEFT_TRICK_Y = 110;
     public static final int TOP_TRICK_X = 400;

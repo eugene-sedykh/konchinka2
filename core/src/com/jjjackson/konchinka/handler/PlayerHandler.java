@@ -6,7 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.listener.EndButtonListener;
 import com.jjjackson.konchinka.listener.SortButtonListener;
+import com.jjjackson.konchinka.listener.TrickButtonListener;
 import com.jjjackson.konchinka.util.PlayerUtil;
 import com.jjjackson.konchinka.util.PositionCalculator;
 
@@ -28,11 +30,19 @@ public class PlayerHandler extends GameObjectHandler {
     public void handle() {
         switch (this.model.states.turn) {
             case NONE:
-                addPlayCardListeners(this.model.player.playCards);
-                model.buttons.sortButton.addListener(new SortButtonListener(this.model, tweenManager, this.cardMover));
+                initListeners();
                 this.model.states.turn = TurnState.WAIT;
                 break;
         }
+    }
+
+    private void initListeners() {
+        addPlayCardListeners(this.model.player.playCards);
+        model.buttons.sortButton.addListener(new SortButtonListener(this.model, this.tweenManager,
+                this.cardMover, this.model.buttons.sortButton));
+        model.buttons.trickButton.addListener(new TrickButtonListener(this.model, this.tweenManager,
+                this.cardMover, this.model.buttons.trickButton));
+        model.buttons.endButton.addListener(new EndButtonListener(this.model, this.tweenManager));
     }
 
     private void addPlayCardListeners(final List<Card> playCards) {
@@ -72,6 +82,7 @@ public class PlayerHandler extends GameObjectHandler {
                         }
                         addPlayCardListener(card);
                         model.playCard = card;
+                        model.player.playCards.remove(card);
                         playCardValue = card.value;
                     }
                 });
@@ -141,13 +152,14 @@ public class PlayerHandler extends GameObjectHandler {
         if (card.isMarked) {
             unmark(card);
         } else {
-            if (playCardValue > newSum) {
+            if (this.playCardValue > newSum) {
                 mark(card);
-            } else if (playCardValue == newSum) {
+            } else if (this.playCardValue == newSum) {
                 mark(card);
                 takeCombinedCards();
+
             } else {
-                unmark(combinedCards);
+                unmark(this.combinedCards);
             }
         }
     }
@@ -163,14 +175,34 @@ public class PlayerHandler extends GameObjectHandler {
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int i, BaseTween<?> baseTween) {
-                        model.player.boardCards.addAll(combinedCards);
                         removeListeners(combinedCards);
                         model.turnCombinedCards.addAll(combinedCards);
                         combinedCards.clear();
                         model.buttons.sortButton.setVisible(true);
                         centerTableCards();
+                        enableEndButtons();
                     }
                 });
+    }
+
+    private void enableEndButtons() {
+        if (this.playCardValue != GameConstants.JACK_VALUE) {
+            if (shouldShowTrickButton()) {
+                model.buttons.trickButton.setVisible(true);
+                model.buttons.trickButton.toFront();
+            } else {
+                model.buttons.endButton.setVisible(true);
+                model.buttons.endButton.toFront();
+            }
+        } else if (shouldShowTrickButton()) {
+            model.buttons.trickButton.setVisible(true);
+            model.buttons.trickButton.toFront();
+        }
+    }
+
+    private boolean shouldShowTrickButton() {
+        return this.model.turnCombinedCards.containsAll(this.model.table.playCards) &&
+                !this.model.table.playCards.isEmpty() && !this.model.isTrickTaken;
     }
 
     private Tween initTween(Card card) {
@@ -181,7 +213,7 @@ public class PlayerHandler extends GameObjectHandler {
     }
 
     private void centerTableCards() {
-        List<Card> cards = this.model.table.playCards;
+        List<Card> cards = new ArrayList<>(this.model.table.playCards);
         cards.removeAll(this.model.turnCombinedCards);
         cardMover.changeCenterCardsPosition(cards, false);
     }
@@ -293,10 +325,10 @@ public class PlayerHandler extends GameObjectHandler {
 
                         combinedCards.remove(card);
                         model.turnCombinedCards.add(card);
-                        model.player.boardCards.add(card);
                         removeListeners(Collections.singletonList(card));
                         model.buttons.sortButton.setVisible(true);
                         centerTableCards();
+                        enableEndButtons();
                     }
                 });
     }
