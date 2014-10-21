@@ -247,26 +247,6 @@ public class PlayerHandler extends GameObjectHandler {
         return res;
     }
 
-    private void moveCardToTable(final Card card) {
-        this.cardMover.changeCenterCardsPosition(this.model.table.playCards, false);
-        Point destination = new Point();
-        PositionCalculator.calcCenter(this.model.table.playCards.size(), destination);
-        card.toFront();
-        Tween.to(card, GameObject.POSITION_XY, 0.2f).
-                target(destination.x, destination.y).
-                start(this.tweenManager).
-                setCallback(new TweenCallback() {
-                    @Override
-                    public void onEvent(int type, BaseTween<?> source) {
-                        if (type != COMPLETE) return;
-
-                        model.currentPlayer.playCards.remove(card);
-                        model.table.playCards.add(card);
-                        model.states.game = GameState.NEXT_TURN;
-                    }
-                });
-    }
-
     private List<Card> getCardsHeap() {
         List<Card> cards = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package com.jjjackson.konchinka.domain;
 
 import aurelienribon.tweenengine.TweenAccessor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -9,6 +10,7 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
 
     public static final int POSITION_XY = 1;
     public static final int ROTATION_XY = 2;
+    public static final int COLOR = 3;
 
     public GameObject(Skin skin, String drawableName) {
         super(skin, drawableName);
@@ -35,6 +37,9 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
                 returnValues[1] = gameObject.getY();
                 returnValues[2] = gameObject.getRotation();
                 return 3;
+            case COLOR:
+                returnValues[0] = gameObject.getColor().a;
+                return 1;
             default:
                 assert false; return -1;
         }
@@ -51,6 +56,10 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
                 gameObject.setX(returnValues[0]);
                 gameObject.setY(returnValues[1]);
                 gameObject.setRotation(returnValues[2]);
+                break;
+            case COLOR:
+                gameObject.setColor(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b, returnValues[0]);
+                gameObject.pack();
                 break;
             default:
                 assert false; break;

@@ -1,6 +1,7 @@
 package com.jjjackson.konchinka.handler;
 
-import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.*;
+import com.badlogic.gdx.graphics.Color;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.CpuTurn;
@@ -12,7 +13,7 @@ public class OpponentHandler extends GameObjectHandler {
     private final static List<String> VALUABLE_CARDS = Arrays.asList("c1", "d1", "h1", "s1", "d10", "s2");
 
     private Card playCard;
-    private List<Card> combinableCards;
+    private List<Card> combinedCards;
 
     public OpponentHandler(GameModel model, TweenManager tweenManager) {
         super(model, tweenManager);
@@ -26,7 +27,55 @@ public class OpponentHandler extends GameObjectHandler {
                 break;
             case CHOOSE_PLAY_CARD:
                 choosePlayCard();
+                initPlayCardMovement(this.playCard);
+                this.model.states.cpuTurn = CpuTurn.WAIT;
+                break;
+            case WAIT:
+                break;
         }
+    }
+
+    private void initPlayCardMovement(final Card card) {
+        card.toFront();
+        card.setDrawable(this.model.skin, card.face);
+        Tween.to(card, GameObject.POSITION_XY, 0.2f).
+                target(GameConstants.PLAY_CARD_X, GameConstants.PLAY_CARD_Y).
+                start(this.tweenManager).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        if (type != COMPLETE) return;
+
+                        if (combinedCards.isEmpty()) {
+                            moveCardToTable(card);
+                        } else {
+                            markCombinableCards();
+                        }
+                    }
+                });
+    }
+
+    private void markCombinableCards() {
+        Tween.setCombinedAttributesLimit(4);
+        Timeline sequence = Timeline.createSequence();
+        for (Card card : this.combinedCards) {
+            sequence.push(initMarking(card));
+        }
+        sequence.start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int i, BaseTween<?> baseTween) {
+
+                    }
+                });
+    }
+
+    private Tween initMarking(Card card) {
+        return Tween.to(card, GameObject.COLOR, 0.2f).
+                target(0.8f).
+                delay(0.5f).
+                start(this.tweenManager);
     }
 
     private void choosePlayCard() {
@@ -34,7 +83,7 @@ public class OpponentHandler extends GameObjectHandler {
         CardCombination bestCombination = calculateAndChooseCombination(playCardHeap, this.model.currentPlayer.playCards,
                 this.model.table);
         this.playCard = bestCombination.card;
-        this.combinableCards = bestCombination.combination;
+        this.combinedCards = bestCombination.combination;
     }
 
     private List<Card> getPlayCardHeap() {
@@ -56,6 +105,7 @@ public class OpponentHandler extends GameObjectHandler {
         Map<Card, List<List<Card>>> cardCombinations = new HashMap<>();
         for (Card playerCard : playerCards) {
             List<List<Card>> combinations = this.cardCombinator.getCombinations(cardsHeap, playerCard.value);
+            if (combinations.isEmpty()) continue;
             cardCombinations.put(playerCard, combinations);
         }
         if (cardCombinations.isEmpty()) {
@@ -143,16 +193,38 @@ public class OpponentHandler extends GameObjectHandler {
         return false;
     }
 
-
     private CardCombination buildJackCombination(Card jack, Map<Card, List<List<Card>>> cardCombinations, Table table) {
         CardCombination cardCombination = new CardCombination();
         cardCombination.card = jack;
+        cardCombination.combination = table.playCards;
         List<List<Card>> combinations = cardCombinations.get(jack);
         if (combinations == null) {
-            cardCombination.combination = table.playCards;
             return cardCombination;
+        } else {
+            List<Card> valuableCombination = findMaxValuableCombination(combinations);
+            cardCombination.combination.removeAll(valuableCombination);
+            cardCombination.combination.addAll(valuableCombination);
         }
-        return null;
+        return cardCombination;
+    }
+
+    private List<Card> findMaxValuableCombination(List<List<Card>> combinations) {
+        int maxValuableNumber = 0;
+        List<Card> result = null;
+
+        for (List<Card> combination : combinations) {
+            int valuableNumber = 0;
+            for (Card card : combination) {
+                if (VALUABLE_CARDS.contains(card.face)) {
+                    valuableNumber++;
+                }
+            }
+            if (valuableNumber > maxValuableNumber) {
+                result = combination;
+            }
+        }
+
+        return result;
     }
 
     private Map<Card, List<List<Card>>> getCombinationsWithValuableCards(Map<Card, List<List<Card>>> cardCombinations) {
