@@ -6,6 +6,8 @@ import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.domain.state.DealState;
+import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.util.PlayerUtil;
 import com.jjjackson.konchinka.util.PositionCalculator;
 

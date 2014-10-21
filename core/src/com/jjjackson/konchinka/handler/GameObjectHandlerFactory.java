@@ -2,7 +2,7 @@ package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.TweenManager;
 import com.jjjackson.konchinka.domain.GameModel;
-import com.jjjackson.konchinka.domain.GameState;
+import com.jjjackson.konchinka.domain.state.GameState;
 
 public class GameObjectHandlerFactory {
 

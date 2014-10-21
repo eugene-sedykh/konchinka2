@@ -1,15 +1,15 @@
 package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.*;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.domain.state.GameState;
+import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.listener.EndButtonListener;
 import com.jjjackson.konchinka.listener.SortButtonListener;
 import com.jjjackson.konchinka.listener.TrickButtonListener;
-import com.jjjackson.konchinka.util.PlayerUtil;
 import com.jjjackson.konchinka.util.PositionCalculator;
 
 import java.util.ArrayList;
@@ -247,7 +247,7 @@ public class PlayerHandler extends GameObjectHandler {
         return res;
     }
 
-    private void moveCardToTable(Actor card) {
+    private void moveCardToTable(final Card card) {
         this.cardMover.changeCenterCardsPosition(this.model.table.playCards, false);
         Point destination = new Point();
         PositionCalculator.calcCenter(this.model.table.playCards.size(), destination);
@@ -260,7 +260,9 @@ public class PlayerHandler extends GameObjectHandler {
                     public void onEvent(int type, BaseTween<?> source) {
                         if (type != COMPLETE) return;
 
-                        PlayerUtil.switchPlayer(model);
+                        model.currentPlayer.playCards.remove(card);
+                        model.table.playCards.add(card);
+                        model.states.game = GameState.NEXT_TURN;
                     }
                 });
     }

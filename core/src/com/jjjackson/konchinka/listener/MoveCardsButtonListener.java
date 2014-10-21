@@ -36,7 +36,6 @@ public abstract class MoveCardsButtonListener extends ClickListener {
     public void clicked(InputEvent event, float x, float y) {
         if (this.model.fog.isVisible()) {
             moveSortedCards();
-            enableOtherButtons();
         } else {
             disableCards();
             disableOtherButtons();
@@ -150,5 +149,6 @@ public abstract class MoveCardsButtonListener extends ClickListener {
     protected void endSorting() {
         this.model.fog.setVisible(false);
         enableCards();
+        enableOtherButtons();
     }
 }

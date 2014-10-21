@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.domain.state.GameState;
+import com.jjjackson.konchinka.domain.state.TurnState;
 
 public class EndButtonListener extends ClickListener {
 

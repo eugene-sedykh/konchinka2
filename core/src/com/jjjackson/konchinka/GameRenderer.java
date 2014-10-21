@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.jjjackson.konchinka.domain.Card;
-import com.jjjackson.konchinka.domain.DealState;
+import com.jjjackson.konchinka.domain.state.DealState;
 import com.jjjackson.konchinka.domain.Fog;
 import com.jjjackson.konchinka.domain.GameModel;
 

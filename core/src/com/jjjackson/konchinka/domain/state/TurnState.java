@@ -1,4 +1,4 @@
-package com.jjjackson.konchinka.domain;
+package com.jjjackson.konchinka.domain.state;
 
 public enum TurnState {
     WAIT,
