@@ -132,6 +132,12 @@ public class PackHandler extends GameObjectHandler {
             this.movingCard = this.model.cards.remove(0);
             initStartPosition(this.movingCard, (int) this.model.pack.getX(), (int) this.model.pack.getY());
             initEndPosition(this.movingCard);
+
+            CardHolder currentPlayer = getCurrentPlayer();
+            if (currentPlayer == this.model.player || currentPlayer instanceof Table) {
+                this.movingCard.showFace();
+            }
+
             this.isCardMoving = true;
         } else if (!this.isMovementInit) {
             Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
@@ -207,6 +213,7 @@ public class PackHandler extends GameObjectHandler {
             this.movingCard = this.model.cards.remove(0);
             initStartPosition(this.movingCard, (int) this.model.pack.getX(), (int) this.model.pack.getY());
             initJackEndPosition(this.movingCard, this.jackX, this.jackY);
+            this.movingCard.showFace();
             this.isCardMoving = true;
         } else if (!this.isMovementInit) {
             Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
@@ -252,6 +259,7 @@ public class PackHandler extends GameObjectHandler {
                             model.table.playCards.remove(movingCard);
                             movingCard.setX(-100);
                             movingCard.setY(-100);
+                            movingCard.showBack();
                         }
                     });
             this.isMovementInit = true;

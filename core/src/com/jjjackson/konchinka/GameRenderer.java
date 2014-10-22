@@ -1,7 +1,6 @@
 package com.jjjackson.konchinka;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -9,11 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.jjjackson.konchinka.domain.Card;
-import com.jjjackson.konchinka.domain.state.DealState;
 import com.jjjackson.konchinka.domain.Fog;
 import com.jjjackson.konchinka.domain.GameModel;
-
-import java.util.List;
 
 public class GameRenderer {
 
@@ -81,37 +77,8 @@ public class GameRenderer {
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        showCardsFace(this.model.player.playCards);
-        showCardsFace(this.model.table.playCards);
-
-        if (this.model.states.deal == DealState.JACK_OUT) {
-            showJacksBack(this.model.cards);
-        }
-
         this.stage.act(delta);
         this.stage.draw();
-    }
-
-    private void showJacksBack(List<Card> cards) {
-        for (Card card : cards) {
-            if (card.value == GameConstants.JACK_VALUE) {
-                card.setDrawable(this.skin, BACK_DRAWABLE_NAME);
-                card.pack();
-            }
-        }
-    }
-
-    private void showCardsFace(List<Card> cards) {
-        for (Card card : cards) {
-            if (this.model.player.tricks.contains(card)) return;
-            card.setDrawable(this.skin, card.face);
-            if (card.isMarked) {
-                card.setColor(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b, 0.8f);
-            } else {
-                card.setColor(Color.WHITE);
-            }
-            card.pack();
-        }
     }
 
     public void show() {

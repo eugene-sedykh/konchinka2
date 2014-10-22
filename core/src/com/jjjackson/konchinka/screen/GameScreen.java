@@ -39,7 +39,7 @@ public class GameScreen implements Screen {
         gameModel.states = new States();
         initPack(gameModel);
         initCards(gameModel);
-        gameModel.dealerPosition = CardPosition.BOTTOM;
+        gameModel.dealerPosition = CardPosition.RIGHT;
         initPlayers(gameModel, 4, gameModel.dealerPosition);
         return gameModel;
     }

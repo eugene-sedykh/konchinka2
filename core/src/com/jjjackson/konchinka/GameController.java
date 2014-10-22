@@ -1,5 +1,6 @@
 package com.jjjackson.konchinka;
 
+import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.handler.GameObjectHandlerFactory;
@@ -12,6 +13,7 @@ public class GameController {
     public GameController(GameModel gameModel) {
         this.model = gameModel;
         this.tweenManager = new TweenManager();
+        Tween.setCombinedAttributesLimit(4);
         this.handlerFactory = new GameObjectHandlerFactory(this.model, this.tweenManager);
     }
 

@@ -37,7 +37,7 @@ public abstract class GameObjectHandler {
     }
 
     protected void moveCardToTable(final Card card) {
-        this.cardMover.changeCenterCardsPosition(this.model.table.playCards, false);
+        this.cardMover.changeCenterCardsPosition(this.model.table.playCards, true);
         Point destination = new Point();
         PositionCalculator.calcCenter(this.model.table.playCards.size(), destination);
         card.toFront();

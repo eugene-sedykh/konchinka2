@@ -4,13 +4,14 @@ import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
-import com.jjjackson.konchinka.domain.*;
-import com.jjjackson.konchinka.domain.state.GameState;
+import com.jjjackson.konchinka.domain.Card;
+import com.jjjackson.konchinka.domain.GameModel;
+import com.jjjackson.konchinka.domain.GameObject;
+import com.jjjackson.konchinka.domain.User;
 import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.listener.EndButtonListener;
 import com.jjjackson.konchinka.listener.SortButtonListener;
 import com.jjjackson.konchinka.listener.TrickButtonListener;
-import com.jjjackson.konchinka.util.PositionCalculator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,7 +150,7 @@ public class PlayerHandler extends GameObjectHandler {
 
     private void processSingleClick(Card card) {
         int newSum = getCombinedCardsSum() + card.value;
-        if (card.isMarked) {
+        if (card.isMarked()) {
             unmark(card);
         } else {
             if (this.playCardValue > newSum) {
@@ -167,7 +168,7 @@ public class PlayerHandler extends GameObjectHandler {
     private void takeCombinedCards() {
         Timeline sequence = Timeline.createSequence();
         for (Card card : this.combinedCards) {
-            card.isMarked = false;
+            card.unmark();
             sequence.push(initTween(card));
         }
         sequence.start(this.tweenManager).
@@ -222,18 +223,18 @@ public class PlayerHandler extends GameObjectHandler {
         Iterator<Card> iterator = combinedCards.iterator();
         while (iterator.hasNext()) {
             Card card = iterator.next();
-            card.isMarked = false;
+            card.unmark();
             iterator.remove();
         }
     }
 
     private void mark(Card card) {
-        card.isMarked = true;
+        card.mark();
         this.combinedCards.add(card);
     }
 
     private void unmark(Card card) {
-        card.isMarked = false;
+        card.unmark();
         this.combinedCards.remove(card);
     }
 
@@ -295,7 +296,7 @@ public class PlayerHandler extends GameObjectHandler {
     }
 
     private void processDoubleClick(final Card card) {
-        card.isMarked = false;
+        card.unmark();
         card.toFront();
         Tween.to(card, GameObject.ROTATION_XY, 0.2f).
                 target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).

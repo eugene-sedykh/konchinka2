@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
-import com.jjjackson.konchinka.GameRenderer;
 import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.domain.GameObject;
@@ -65,8 +64,7 @@ public class TrickButtonListener extends MoveCardsButtonListener {
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
-                        card.setDrawable(model.skin, GameRenderer.BACK_DRAWABLE_NAME);
-                        card.pack();
+                        card.showBack();
                         moveSortedCards();
                     }
                 }).start(this.tweenManager);

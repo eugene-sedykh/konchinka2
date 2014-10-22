@@ -1,6 +1,7 @@
 package com.jjjackson.konchinka.util;
 
 import com.jjjackson.konchinka.GameConstants;
+import com.jjjackson.konchinka.domain.CardPosition;
 import com.jjjackson.konchinka.domain.Point;
 
 public class PositionCalculator {
@@ -37,5 +38,28 @@ public class PositionCalculator {
 
     public static void calcCenter(int cardNumber, Point destination) {
         calcCenter(cardNumber, destination, false);
+    }
+
+    public static Point calcBoard(CardPosition cardPosition) {
+        Point destination = new Point();
+        switch (cardPosition) {
+            case LEFT:
+                destination.x = GameConstants.BOARD_LEFT_X;
+                destination.y = GameConstants.BOARD_LEFT_Y;
+                break;
+            case TOP:
+                destination.x = GameConstants.BOARD_TOP_X;
+                destination.y = GameConstants.BOARD_TOP_Y;
+                break;
+            case RIGHT:
+                destination.x = GameConstants.BOARD_RIGHT_X;
+                destination.y = GameConstants.BOARD_RIGHT_Y;
+                break;
+        }
+        return destination;
+    }
+
+    public static int calcRotation(CardPosition cardPosition) {
+        return cardPosition == CardPosition.BOTTOM || cardPosition == CardPosition.TOP ? 90 : 0;
     }
 }
