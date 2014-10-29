@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.CpuTurn;
+import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.util.PositionCalculator;
 
 import java.util.ArrayList;
@@ -125,22 +126,33 @@ public class OpponentHandler extends GameObjectHandler {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
                         turnCombinedCards.add(playCard);
-                        endTurn();
+                        sortAndTrick();
                     }
                 }).
-                delay(0.3f);
+                delay(0.3f).
+                start(this.tweenManager);
     }
 
-    private void endTurn() {
+    private void sortAndTrick() {
         List<Card> sortedCards = sort(this.turnCombinedCards);
 
-        if (needToSort(sortedCards, this.turnCombinedCards)) {
+        if (needToSort(sortedCards, this.turnCombinedCards) || needTakeTrick()) {
             model.fog.setVisible(true);
             model.fog.toFront();
             moveCardsToSort(sortedCards, this.turnCombinedCards);
         } else {
-            takeTrickIfExists();
+            endTurn();
         }
+    }
+
+    private void endTurn() {
+        this.model.fog.setVisible(false);
+        this.model.fog.toBack();
+        this.model.states.game = GameState.NEXT_TURN;
+        this.model.states.cpuTurn = CpuTurn.NONE;
+        ((User) this.model.currentPlayer).boardCards.addAll(this.turnCombinedCards);
+        this.playCard = null;
+        this.turnCombinedCards.clear();
     }
 
     private boolean needToSort(List<Card> sortedCards, List<Card> turnCombinedCards) {
@@ -159,8 +171,32 @@ public class OpponentHandler extends GameObjectHandler {
             this.buffer.add(card);
             tween.start(this.tweenManager);
         } else {
+            if (needTakeTrick()) {
+                Card trick = sortedCards.remove(sortedCards.size() - 1);
+                this.turnCombinedCards.remove(trick);
+                takeTrick(trick, (User)this.model.currentPlayer);
+            }
             moveCardsToPlayer(sortedCards);
         }
+    }
+
+    private boolean needTakeTrick() {
+        return this.turnCombinedCards.containsAll(this.initialTable);
+    }
+
+    private void takeTrick(final Card trick, User user) {
+        user.tricks.add(trick);
+        trick.toFront();
+        Point destination = PositionCalculator.calcTrick(user.cardPosition);
+        Tween.to(trick, GameObject.ROTATION_XY, 0.2f).
+                target(destination.x, destination.y, 0).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        trick.showBack();
+                    }
+                });
     }
 
     private Tween initTween(final Card card, final List<Card> sortedCards) {
@@ -188,18 +224,16 @@ public class OpponentHandler extends GameObjectHandler {
             this.turnCombinedCards.add(card);
             tween.start(this.tweenManager);
         } else {
-            takeTrickIfExists();
+            endTurn();
         }
-    }
-
-    private void takeTrickIfExists() {
-
     }
 
     private Tween initBackTween(Card card, final List<Card> sortedCards) {
         card.toFront();
+        Point destination = PositionCalculator.calcBoard(this.model.currentPlayer.cardPosition);
+        int degree = PositionCalculator.calcRotation(this.model.currentPlayer.cardPosition);
         return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
-                target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
+                target(destination.x, destination.y, degree).
                 start(this.tweenManager).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
@@ -223,29 +257,29 @@ public class OpponentHandler extends GameObjectHandler {
                     if (lhs.value == rhs.value) {
                         return 0;
                     }
-                    return lhs.value > rhs.value ? 1 : -1;
+                    return lhs.value > rhs.value ? -1 : 1;
                 }
 
                 if (GameConstants.VALUABLE_CARDS.contains(lhs.face) && !GameConstants.VALUABLE_CARDS.contains(rhs.face)) {
-                    return -1;
+                    return 1;
                 }
                 if (!GameConstants.VALUABLE_CARDS.contains(lhs.face) && GameConstants.VALUABLE_CARDS.contains(rhs.face)) {
-                    return 1;
-                }
-
-                if (lhs.value == GameConstants.JACK_VALUE) return 1;
-
-                if (lhs.cardSuit == CardSuit.CLUBS && rhs.cardSuit != CardSuit.CLUBS) {
                     return -1;
                 }
-                if (lhs.cardSuit != CardSuit.CLUBS && rhs.cardSuit == CardSuit.CLUBS) {
+
+                if (lhs.value == GameConstants.JACK_VALUE) return -1;
+
+                if (lhs.cardSuit == CardSuit.CLUBS && rhs.cardSuit != CardSuit.CLUBS) {
                     return 1;
                 }
+                if (lhs.cardSuit != CardSuit.CLUBS && rhs.cardSuit == CardSuit.CLUBS) {
+                    return -1;
+                }
                 if (lhs.cardSuit == CardSuit.CLUBS) {
-                    return lhs.value > rhs.value ? 1 : -1;
+                    return lhs.value > rhs.value ? -1 : 1;
                 }
 
-                return lhs.value > rhs.value ? 1 : -1;
+                return lhs.value > rhs.value ? -1 : 1;
             }
         });
         return cards;

@@ -6,6 +6,7 @@ import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.GameState;
+import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.util.CardCombinator;
 import com.jjjackson.konchinka.util.CardMover;
 import com.jjjackson.konchinka.util.PositionCalculator;
@@ -52,6 +53,7 @@ public abstract class GameObjectHandler {
                         model.currentPlayer.playCards.remove(card);
                         model.table.playCards.add(card);
                         model.states.game = GameState.NEXT_TURN;
+                        model.states.turn = TurnState.NONE;
                     }
                 });
     }

@@ -48,7 +48,14 @@ public class GameConstants {
     public static final int BOARD_LEFT_X = 0;
     public static final int BOARD_LEFT_Y = 500;
     public static final int BOARD_TOP_X = 288;
-    public static final int BOARD_TOP_Y = 570;
+    public static final int BOARD_TOP_Y = 599;
     public static final int BOARD_RIGHT_X = 409;
     public static final int BOARD_RIGHT_Y = 500;
+
+    public static final int TRICK_LEFT_X = 0;
+    public static final int TRICK_LEFT_Y = 600;
+    public static final int TRICK_TOP_X = 399;
+    public static final int TRICK_TOP_Y = 704;
+    public static final int TRICK_RIGHT_X = 409;
+    public static final int TRICK_RIGHT_Y = 600;
 }

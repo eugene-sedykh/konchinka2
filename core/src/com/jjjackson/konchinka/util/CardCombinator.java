@@ -138,14 +138,19 @@ public class CardCombinator {
         return null;
     }
 
-    private CardCombination getEmptyCombination(List<Card> playerCards) {
+    private CardCombination getEmptyCombination(List<Card> cards) {
         CardCombination emptyCombination = new CardCombination();
-        emptyCombination.card = getLowestCard(playerCards);
+        emptyCombination.card = getLowestCard(cards);
         emptyCombination.combination = Collections.EMPTY_LIST;
         return emptyCombination;
     }
-    private Card getLowestCard(List<Card> playerCards) {
-        Collections.sort(playerCards, new Comparator<Card>() {
+    private Card getLowestCard(List<Card> cards) {
+        if (cards.isEmpty()) {
+            throw new IllegalStateException("Cannot get lowest card - list is empty");
+        }
+        if (cards.size() < 2) return cards.get(0);
+
+        Collections.sort(cards, new Comparator<Card>() {
             @Override
             public int compare(Card lhs, Card rhs) {
                 if (GameConstants.VALUABLE_CARDS.contains(lhs.face)) {
@@ -160,7 +165,7 @@ public class CardCombinator {
                 return lhs.value > rhs.value ? 1 : -1;
             }
         });
-        return playerCards.get(0);
+        return cards.get(0);
     }
     private CardCombination chooseCombination(Card jack, Map<Card, List<List<Card>>> cardCombinations, Table table) {
         Map<Card, List<List<Card>>> combinationsWithTrick = getCombinationsWithTrick(cardCombinations, table);

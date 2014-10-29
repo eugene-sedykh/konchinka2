@@ -13,7 +13,6 @@ public class Card extends GameObject {
     public int value;
     public int endX;
     public int endY;
-    public boolean showFace = true;
     public String face;
     private boolean isMarked;
 

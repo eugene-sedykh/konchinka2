@@ -62,4 +62,23 @@ public class PositionCalculator {
     public static int calcRotation(CardPosition cardPosition) {
         return cardPosition == CardPosition.BOTTOM || cardPosition == CardPosition.TOP ? 90 : 0;
     }
+
+    public static Point calcTrick(CardPosition cardPosition) {
+        Point destination = new Point();
+        switch (cardPosition) {
+            case LEFT:
+                destination.x = GameConstants.TRICK_LEFT_X;
+                destination.y = GameConstants.TRICK_LEFT_Y;
+                break;
+            case TOP:
+                destination.x = GameConstants.TRICK_TOP_X;
+                destination.y = GameConstants.TRICK_TOP_Y;
+                break;
+            case RIGHT:
+                destination.x = GameConstants.TRICK_RIGHT_X;
+                destination.y = GameConstants.TRICK_RIGHT_Y;
+                break;
+        }
+        return destination;
+    }
 }
