@@ -1,9 +1,11 @@
 package com.jjjackson.konchinka.util;
 
+import com.badlogic.gdx.Gdx;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.CardCombination;
 import com.jjjackson.konchinka.domain.Table;
+import com.jjjackson.konchinka.handler.CardsSorter;
 
 import java.util.*;
 
@@ -123,15 +125,33 @@ public class CardCombinator {
             if (combinations.isEmpty()) continue;
             cardCombinations.put(playerCard, combinations);
         }
-        if (cardCombinations.isEmpty()) {
-            return getEmptyCombination(playerCards);
+        if (cardCombinations.isEmpty() || shouldPass(playerCards, cardCombinations)) {
+            CardCombination emptyCombination = getEmptyCombination(playerCards);
+            Gdx.app.log("Empty", emptyCombination.card.face);
+            if (emptyCombination.card.isJack()) {
+                emptyCombination.combination = table.playCards;
+            }
+            return emptyCombination;
         }
         return chooseCombination(getJack(playerCards), cardCombinations, table);
     }
 
+    private boolean shouldPass(List<Card> playerCards, Map<Card, List<List<Card>>> cardCombinations) {
+        return playerCards.size() > 1 && areJacksOnly(cardCombinations.keySet()) && !isValuableCardPresent(cardCombinations.values());
+    }
+
+    private boolean isValuableCardPresent(Collection<List<List<Card>>> combinations) {
+        for (List<List<Card>> combination : combinations) {
+            for (List<Card> cards : combination) {
+                if (isValuableCardPresent(cards)) return true;
+            }
+        }
+        return false;
+    }
+
     private Card getJack(List<Card> playerCards) {
         for (Card card : playerCards) {
-            if (card.value == GameConstants.JACK_VALUE) {
+            if (card.isJack()) {
                 return card;
             }
         }
@@ -144,39 +164,30 @@ public class CardCombinator {
         emptyCombination.combination = Collections.EMPTY_LIST;
         return emptyCombination;
     }
+
     private Card getLowestCard(List<Card> cards) {
         if (cards.isEmpty()) {
             throw new IllegalStateException("Cannot get lowest card - list is empty");
         }
         if (cards.size() < 2) return cards.get(0);
 
-        Collections.sort(cards, new Comparator<Card>() {
-            @Override
-            public int compare(Card lhs, Card rhs) {
-                if (GameConstants.VALUABLE_CARDS.contains(lhs.face)) {
-                    return (rhs.value != GameConstants.JACK_VALUE) ? 1 : -1;
-                }
-                if (GameConstants.VALUABLE_CARDS.contains(rhs.face)) {
-                    return (lhs.value != GameConstants.JACK_VALUE) ? -1 : 1;
-                }
-                if (lhs.value == rhs.value) {
-                    return 0;
-                }
-                return lhs.value > rhs.value ? 1 : -1;
-            }
-        });
-        return cards.get(0);
+        Collections.sort(cards, new CardsSorter());
+        return cards.get(cards.size() - 1);
     }
+
     private CardCombination chooseCombination(Card jack, Map<Card, List<List<Card>>> cardCombinations, Table table) {
         Map<Card, List<List<Card>>> combinationsWithTrick = getCombinationsWithTrick(cardCombinations, table);
         if (!combinationsWithTrick.isEmpty()) {
+            Gdx.app.log("Trick", "true");
             return chooseCombinationWithTrick(combinationsWithTrick);
         }
         if (jack != null && isValuableCardPresent(table.playCards)) {
-            return buildJackCombination(jack, cardCombinations, table);
+            Gdx.app.log("Jack", "true");
+            return buildJackCombination(jack, cardCombinations);
         }
         Map<Card, List<List<Card>>> combinationsWithValuableCards = getCombinationsWithValuableCards(cardCombinations);
         if (!combinationsWithValuableCards.isEmpty()) {
+            Gdx.app.log("Valuable", "true");
             return chooseCombinationWithValuableCards(combinationsWithValuableCards);
         }
         return chooseCombinationWithMaxCards(cardCombinations);
@@ -205,7 +216,7 @@ public class CardCombinator {
 
     private boolean isCombinationWithTrick(List<List<Card>> combinations, List<Card> tableCards) {
         for (List<Card> combination : combinations) {
-            if (combination.containsAll(tableCards)) {
+            if (!tableCards.isEmpty() && combination.containsAll(tableCards)) {
                 return true;
             }
         }
@@ -213,24 +224,21 @@ public class CardCombinator {
         return false;
     }
 
-    private CardCombination buildJackCombination(Card jack, Map<Card, List<List<Card>>> cardCombinations, Table table) {
+    private CardCombination buildJackCombination(Card jack, Map<Card, List<List<Card>>> cardCombinations) {
         CardCombination cardCombination = new CardCombination();
         cardCombination.card = jack;
-        cardCombination.combination = table.playCards;
         List<List<Card>> combinations = cardCombinations.get(jack);
         if (combinations == null) {
             return cardCombination;
         } else {
-            List<Card> valuableCombination = findMaxValuableCombination(combinations);
-            cardCombination.combination.removeAll(valuableCombination);
-            cardCombination.combination.addAll(valuableCombination);
+            cardCombination.combination = findMaxValuableCombination(combinations);
         }
         return cardCombination;
     }
 
     private List<Card> findMaxValuableCombination(List<List<Card>> combinations) {
         int maxValuableNumber = 0;
-        List<Card> result = null;
+        List<Card> result = new ArrayList<>();
 
         for (List<Card> combination : combinations) {
             int valuableNumber = 0;
@@ -290,6 +298,7 @@ public class CardCombinator {
         CardCombination cardCombination = new CardCombination();
         cardCombination.combination = new ArrayList<>();
         for (Map.Entry<Card, List<List<Card>>> entry : cardCombinations.entrySet()) {
+            if (entry.getKey().isJack() && !areJacksOnly(cardCombinations.keySet())) continue;
             for (List<Card> combination : entry.getValue()) {
                 if (combination.size() > cardCombination.combination.size()) {
                     cardCombination.combination = combination;
@@ -297,7 +306,15 @@ public class CardCombinator {
                 }
             }
         }
+        Gdx.app.log("Max", cardCombination.card != null ? cardCombination.card.face : "null");
         return cardCombination;
+    }
+
+    private boolean areJacksOnly(Set<Card> cards) {
+        for (Card card : cards) {
+            if (!card.isJack()) return false;
+        }
+        return true;
     }
 
     private boolean isValuableCardPresent(List<Card> cards) {

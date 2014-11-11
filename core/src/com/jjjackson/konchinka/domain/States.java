@@ -8,7 +8,7 @@ import com.jjjackson.konchinka.domain.state.TurnState;
 public class States {
 
     public GameState game = GameState.NONE;
-    public TurnState turn = TurnState.NONE;
+    public TurnState turn = TurnState.INIT_BUTTONS;
     public DealState deal = DealState.PACK_IN;
     public CpuTurn cpuTurn = CpuTurn.NONE;
 

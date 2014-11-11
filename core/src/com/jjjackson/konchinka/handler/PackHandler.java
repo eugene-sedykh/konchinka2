@@ -140,7 +140,7 @@ public class PackHandler extends GameObjectHandler {
 
             this.isCardMoving = true;
         } else if (!this.isMovementInit) {
-            Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
+            Tween.to(this.movingCard, GameObject.POSITION_XY, GameConstants.DEALING_SPEED).
                     target(this.movingCard.endX, this.movingCard.endY).
                     start(this.tweenManager).
                     setCallback(new TweenCallback() {
@@ -244,7 +244,7 @@ public class PackHandler extends GameObjectHandler {
             initJackEndPosition(jack, this.model.pack.getX(), this.model.pack.getY());
             this.isCardMoving = true;
         } else if (!this.isMovementInit) {
-            Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
+            Tween.to(this.movingCard, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
                     target(this.movingCard.endX, this.movingCard.endY).
                     start(this.tweenManager).
                     setCallback(new TweenCallback() {

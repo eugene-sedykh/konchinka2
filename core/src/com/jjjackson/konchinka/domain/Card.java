@@ -8,7 +8,7 @@ import com.jjjackson.konchinka.GameConstants;
 public class Card extends GameObject {
 
     public static final String BACK = "b1fv";
-    public static final float MARK_OPACITY = 0.8f;
+    public static final float MARK_OPACITY = 1f;
     public final CardSuit cardSuit;
     public int value;
     public int endX;
@@ -49,5 +49,9 @@ public class Card extends GameObject {
 
     public boolean isMarked() {
         return this.isMarked;
+    }
+
+    public boolean isJack() {
+        return this.value == GameConstants.JACK_VALUE;
     }
 }

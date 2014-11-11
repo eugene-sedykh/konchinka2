@@ -13,7 +13,7 @@ public class CardMover {
 
     public void changeCenterCardsPosition(List<Card> cards, boolean addPlaceholder, boolean shiftVertically) {
         int size = cards.size();
-        int rows = size / 4;
+        int rows = (int)Math.ceil((double) size / 4d);
         int row = 0;
         for (int i = 0; i < size; i++) {
             int indexInRow = i % 4;

@@ -2,19 +2,6 @@ package com.jjjackson.konchinka.domain.state;
 
 public enum TurnState {
     WAIT,
-    PICK_PLAY_CARD,
-    PLAY_CARD_TO_TABLE,
-    COMBINE_CARDS,
-    TAKE_PLAY_CARD,
-    TAKE_COMBINED_CARDS,
-    SHOW_TRICK_BUTTON,
-    SHOW_END_TURN_BUTTON,
-    COMBINE_JACK_CARDS,
-    SORT_CARDS_OUT,
-    SORT_CARDS_PRESS,
-    SORT_CARDS_IN,
-    TRICK_CARDS_OUT,
-    TRICK_CARDS_PRESS,
-    NONE,
-    MOVE_PLAY_CARD
+    INIT_PLAY_CARDS,
+    INIT_BUTTONS
 }

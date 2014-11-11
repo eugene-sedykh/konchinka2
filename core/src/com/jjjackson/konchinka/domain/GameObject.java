@@ -42,8 +42,8 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
                 returnValues[0] = gameObject.getColor().r;
                 returnValues[1] = gameObject.getColor().g;
                 returnValues[2] = gameObject.getColor().b;
-                returnValues[3] = gameObject.getColor().a;
-                return 4;
+//                returnValues[3] = gameObject.getColor().a;
+                return 3;
             default:
                 assert false; return -1;
         }
@@ -62,7 +62,7 @@ public abstract class GameObject extends Image implements TweenAccessor<GameObje
                 gameObject.setRotation(returnValues[2]);
                 break;
             case COLOR:
-                gameObject.setColor(returnValues[0], returnValues[1], returnValues[2], returnValues[3]);
+                gameObject.setColor(returnValues[0], returnValues[1], returnValues[2], 1);
                 gameObject.pack();
                 break;
             default:

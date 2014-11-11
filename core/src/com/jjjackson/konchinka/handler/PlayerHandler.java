@@ -30,20 +30,20 @@ public class PlayerHandler extends GameObjectHandler {
     @Override
     public void handle() {
         switch (this.model.states.turn) {
-            case NONE:
-                initListeners();
+            case INIT_BUTTONS:
+                model.buttons.sortButton.addListener(new SortButtonListener(this.model, this.tweenManager,
+                        this.cardMover, this.model.buttons.sortButton));
+                model.buttons.trickButton.addListener(new TrickButtonListener(this.model, this.tweenManager,
+                        this.cardMover, this.model.buttons.trickButton));
+                model.buttons.endButton.addListener(new EndButtonListener(this.model, this.tweenManager));
+
+                this.model.states.turn = TurnState.INIT_PLAY_CARDS;
+                break;
+            case INIT_PLAY_CARDS:
+                addPlayCardListeners(this.model.player.playCards);
                 this.model.states.turn = TurnState.WAIT;
                 break;
         }
-    }
-
-    private void initListeners() {
-        addPlayCardListeners(this.model.player.playCards);
-        model.buttons.sortButton.addListener(new SortButtonListener(this.model, this.tweenManager,
-                this.cardMover, this.model.buttons.sortButton));
-        model.buttons.trickButton.addListener(new TrickButtonListener(this.model, this.tweenManager,
-                this.cardMover, this.model.buttons.trickButton));
-        model.buttons.endButton.addListener(new EndButtonListener(this.model, this.tweenManager));
     }
 
     private void addPlayCardListeners(final List<Card> playCards) {
@@ -60,7 +60,7 @@ public class PlayerHandler extends GameObjectHandler {
 
     private void initCardMovement(final Card card) {
         card.toFront();
-        Tween.to(card, GameObject.POSITION_XY, 0.2f).
+        Tween.to(card, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.PLAY_CARD_X, GameConstants.PLAY_CARD_Y).
                 start(this.tweenManager).
                 setCallback(new TweenCallback() {
@@ -73,15 +73,15 @@ public class PlayerHandler extends GameObjectHandler {
                             return;
                         }
 
-                        if (card.value == GameConstants.JACK_VALUE) {
+                        addSingleClickListener(getTouchableCards());
+                        if (card.isJack()) {
+                            for (Card playCard : model.table.playCards) {
+                                playCard.getListeners().clear();
+                            }
                             addDoubleClickListener(model.table.playCards);
-                            List<Card> opponentCards = getCardsHeap();
-                            opponentCards.removeAll(model.table.playCards);
-                            addSingleClickListener(opponentCards);
-                        } else {
-                            addSingleClickListener(getCardsHeap());
                         }
                         addPlayCardListener(card);
+
                         model.playCard = card;
                         model.player.playCards.remove(card);
                         playCardValue = card.value;
@@ -94,7 +94,7 @@ public class PlayerHandler extends GameObjectHandler {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 card.toFront();
-                Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+                Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                         target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
                         start(tweenManager).
                         setCallback(new TweenCallback() {
@@ -208,7 +208,7 @@ public class PlayerHandler extends GameObjectHandler {
 
     private Tween initTween(Card card) {
         card.toFront();
-        return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
                 start(this.tweenManager);
     }
@@ -260,6 +260,17 @@ public class PlayerHandler extends GameObjectHandler {
         return cards;
     }
 
+    private List<Card> getTouchableCards() {
+        List<Card> cards = new ArrayList<>();
+
+        cards.addAll(model.table.playCards);
+        for (User user : model.opponents) {
+            cards.addAll(user.boardCards);
+        }
+
+        return cards;
+    }
+
     private void removeListeners(List<Card> playCards) {
         for (Card playCard : playCards) {
             playCard.getListeners().clear();
@@ -298,7 +309,7 @@ public class PlayerHandler extends GameObjectHandler {
     private void processDoubleClick(final Card card) {
         card.unmark();
         card.toFront();
-        Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
                 start(this.tweenManager).
                 setCallback(new TweenCallback() {

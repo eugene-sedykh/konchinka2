@@ -46,16 +46,21 @@ public class GameConstants {
     public static final int PACK_BOTTOM_SHOW_Y = 200;
 
     public static final int BOARD_LEFT_X = 0;
-    public static final int BOARD_LEFT_Y = 500;
+    public static final int BOARD_LEFT_Y = 475;
     public static final int BOARD_TOP_X = 288;
     public static final int BOARD_TOP_Y = 599;
     public static final int BOARD_RIGHT_X = 409;
-    public static final int BOARD_RIGHT_Y = 500;
+    public static final int BOARD_RIGHT_Y = 475;
 
     public static final int TRICK_LEFT_X = 0;
-    public static final int TRICK_LEFT_Y = 600;
+    public static final int TRICK_LEFT_Y = 581;
     public static final int TRICK_TOP_X = 399;
     public static final int TRICK_TOP_Y = 704;
     public static final int TRICK_RIGHT_X = 409;
-    public static final int TRICK_RIGHT_Y = 600;
+    public static final int TRICK_RIGHT_Y = 581;
+
+    public static final float CARD_SPEED = 0.3f;
+    public static final float DEALING_SPEED = 0.2f;
+
+    public static final float PLAY_CARD_TO_TABLE_DELAY = 0.7f;
 }

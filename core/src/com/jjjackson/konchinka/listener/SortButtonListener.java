@@ -51,7 +51,7 @@ public class SortButtonListener extends MoveCardsButtonListener {
 
     private void initMovement(Card card) {
         card.toFront();
-        Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {

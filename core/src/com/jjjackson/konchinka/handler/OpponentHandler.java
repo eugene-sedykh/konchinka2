@@ -2,6 +2,8 @@ package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.CpuTurn;
@@ -45,7 +47,7 @@ public class OpponentHandler extends GameObjectHandler {
     private void initPlayCardMovement(final Card card) {
         card.toFront();
         card.setDrawable(this.model.skin, card.face);
-        Tween.to(card, GameObject.POSITION_XY, 0.2f).
+        Tween.to(card, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.PLAY_CARD_X, GameConstants.PLAY_CARD_Y).
                 start(this.tweenManager).
                 setCallback(new TweenCallback() {
@@ -72,18 +74,24 @@ public class OpponentHandler extends GameObjectHandler {
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int i, BaseTween<?> baseTween) {
-                        takeCombinedCards();
+                        model.stage.addListener(new ClickListener() {
+                            @Override
+                            public void clicked(InputEvent event, float x, float y) {
+                                takeCombinedCards();
+                            }
+                        });
                     }
                 });
     }
 
     private Tween initMarking(Card card) {
-        return Tween.to(card, GameObject.COLOR, 0.2f).
-                target(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b, 0.8f).
+        return Tween.to(card, GameObject.COLOR, GameConstants.CARD_SPEED).
+                target(Color.GRAY.r, Color.GRAY.g, Color.GRAY.b).
                 delay(0.5f);
     }
 
     private void takeCombinedCards() {
+        removeStageListeners();
         Timeline sequence = Timeline.createSequence();
         CardHolder user = getCurrentPlayer();
         Point destination = PositionCalculator.calcBoard(user.cardPosition);
@@ -100,6 +108,10 @@ public class OpponentHandler extends GameObjectHandler {
                         findCombinations();
                     }
                 });
+    }
+
+    private void removeStageListeners() {
+        this.model.stage.getRoot().getListeners().clear();
     }
 
     private void findCombinations() {
@@ -119,7 +131,7 @@ public class OpponentHandler extends GameObjectHandler {
         Point destination = PositionCalculator.calcBoard(user.cardPosition);
         int degree = PositionCalculator.calcRotation(user.cardPosition);
         this.playCard.toFront();
-        Tween.to(this.playCard, GameObject.ROTATION_XY, 0.2f).
+        Tween.to(this.playCard, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, degree).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
@@ -164,39 +176,54 @@ public class OpponentHandler extends GameObjectHandler {
         return false;
     }
 
-    private void moveCardsToSort(List<Card> sortedCards, List<Card> turnCombinedCards) {
+    private void moveCardsToSort(final List<Card> sortedCards, List<Card> turnCombinedCards) {
         if (!turnCombinedCards.isEmpty()) {
             Card card = turnCombinedCards.remove(turnCombinedCards.size() - 1);
             Tween tween = initTween(card, sortedCards);
             this.buffer.add(card);
             tween.start(this.tweenManager);
         } else {
-            if (needTakeTrick()) {
-                Card trick = sortedCards.remove(sortedCards.size() - 1);
-                this.turnCombinedCards.remove(trick);
-                takeTrick(trick, (User)this.model.currentPlayer);
+            if (this.buffer.containsAll(this.initialTable) && !this.initialTable.isEmpty()) {
+                sortedCards.get(sortedCards.size() - 1).mark();
+                this.model.stage.getRoot().addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        initTrickTaking(sortedCards);
+                    }
+                });
+            } else {
+                moveCardsToPlayer(sortedCards);
             }
-            moveCardsToPlayer(sortedCards);
         }
+    }
+
+    private void initTrickTaking(List<Card> sortedCards) {
+        Card trick = sortedCards.remove(sortedCards.size() - 1);
+        trick.unmark();
+        this.buffer.remove(trick);
+        ((User)this.model.currentPlayer).tricks.add(trick);
+        takeTrick(trick, this.model.currentPlayer.cardPosition, sortedCards);
     }
 
     private boolean needTakeTrick() {
         return this.turnCombinedCards.containsAll(this.initialTable);
     }
 
-    private void takeTrick(final Card trick, User user) {
-        user.tricks.add(trick);
+    private void takeTrick(final Card trick, CardPosition cardPosition, final List<Card> sortedCards) {
         trick.toFront();
-        Point destination = PositionCalculator.calcTrick(user.cardPosition);
-        Tween.to(trick, GameObject.ROTATION_XY, 0.2f).
+        Point destination = PositionCalculator.calcTrick(cardPosition);
+        Tween.to(trick, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, 0).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
                         trick.showBack();
+                        moveCardsToPlayer(sortedCards);
+                        removeStageListeners();
                     }
-                });
+                }).
+                start(this.tweenManager);
     }
 
     private Tween initTween(final Card card, final List<Card> sortedCards) {
@@ -205,7 +232,7 @@ public class OpponentHandler extends GameObjectHandler {
         this.cardMover.changeCenterCardsPosition(this.buffer, true, true);
 
         PositionCalculator.calcCenter(this.buffer.size(), destination, true);
-        return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, 0).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
@@ -232,7 +259,7 @@ public class OpponentHandler extends GameObjectHandler {
         card.toFront();
         Point destination = PositionCalculator.calcBoard(this.model.currentPlayer.cardPosition);
         int degree = PositionCalculator.calcRotation(this.model.currentPlayer.cardPosition);
-        return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, degree).
                 start(this.tweenManager).
                 setCallbackTriggers(TweenCallback.COMPLETE).
@@ -250,45 +277,14 @@ public class OpponentHandler extends GameObjectHandler {
 
     private ArrayList<Card> sort(List<Card> turnCombinedCards) {
         ArrayList<Card> cards = new ArrayList<>(turnCombinedCards);
-        Collections.sort(cards, new Comparator<Card>() {
-            @Override
-            public int compare(Card lhs, Card rhs) {
-                if (GameConstants.VALUABLE_CARDS.contains(lhs.face) && GameConstants.VALUABLE_CARDS.contains(rhs.face)) {
-                    if (lhs.value == rhs.value) {
-                        return 0;
-                    }
-                    return lhs.value > rhs.value ? -1 : 1;
-                }
-
-                if (GameConstants.VALUABLE_CARDS.contains(lhs.face) && !GameConstants.VALUABLE_CARDS.contains(rhs.face)) {
-                    return 1;
-                }
-                if (!GameConstants.VALUABLE_CARDS.contains(lhs.face) && GameConstants.VALUABLE_CARDS.contains(rhs.face)) {
-                    return -1;
-                }
-
-                if (lhs.value == GameConstants.JACK_VALUE) return -1;
-
-                if (lhs.cardSuit == CardSuit.CLUBS && rhs.cardSuit != CardSuit.CLUBS) {
-                    return 1;
-                }
-                if (lhs.cardSuit != CardSuit.CLUBS && rhs.cardSuit == CardSuit.CLUBS) {
-                    return -1;
-                }
-                if (lhs.cardSuit == CardSuit.CLUBS) {
-                    return lhs.value > rhs.value ? -1 : 1;
-                }
-
-                return lhs.value > rhs.value ? -1 : 1;
-            }
-        });
+        Collections.sort(cards, new CardsSorter());
         return cards;
     }
 
     private Tween initTake(final Card card, Point destination, int degree) {
         card.unmark();
         card.toFront();
-        return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, degree).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {

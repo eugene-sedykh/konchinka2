@@ -4,7 +4,9 @@ import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
+import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.domain.state.CpuTurn;
 import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.util.CardCombinator;
@@ -42,7 +44,7 @@ public abstract class GameObjectHandler {
         Point destination = new Point();
         PositionCalculator.calcCenter(this.model.table.playCards.size(), destination);
         card.toFront();
-        Tween.to(card, GameObject.POSITION_XY, 0.2f).
+        Tween.to(card, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y).
                 start(this.tweenManager).
                 setCallback(new TweenCallback() {
@@ -53,8 +55,9 @@ public abstract class GameObjectHandler {
                         model.currentPlayer.playCards.remove(card);
                         model.table.playCards.add(card);
                         model.states.game = GameState.NEXT_TURN;
-                        model.states.turn = TurnState.NONE;
+                        model.states.turn = TurnState.INIT_PLAY_CARDS;
+                        model.states.cpuTurn = CpuTurn.NONE;
                     }
-                });
+                }).delay(GameConstants.PLAY_CARD_TO_TABLE_DELAY);
     }
 }

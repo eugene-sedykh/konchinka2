@@ -4,6 +4,7 @@ import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -99,7 +100,7 @@ public abstract class MoveCardsButtonListener extends ClickListener {
 
     private Tween initBackToPlayerTween(Card card) {
             card.toFront();
-            return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+            return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                     target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
                     start(this.tweenManager).
                     setCallbackTriggers(TweenCallback.COMPLETE).
@@ -133,7 +134,7 @@ public abstract class MoveCardsButtonListener extends ClickListener {
 
         PositionCalculator.calcCenter(this.sortCards.size(), destination, true);
         card.addListener(getCardListener(card));
-        return Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, 0).
                 setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {

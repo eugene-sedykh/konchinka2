@@ -13,7 +13,6 @@ import com.jjjackson.konchinka.domain.GameModel;
 
 public class GameRenderer {
 
-    public static final String BACK_DRAWABLE_NAME = "b1fv";
     private GameModel model;
     private Stage stage;
     private Skin skin;

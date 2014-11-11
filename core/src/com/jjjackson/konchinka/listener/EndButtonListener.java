@@ -9,6 +9,8 @@ import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.domain.state.TurnState;
 
+import java.util.List;
+
 public class EndButtonListener extends ClickListener {
 
     private GameModel model;
@@ -30,6 +32,8 @@ public class EndButtonListener extends ClickListener {
         this.model.player.boardCards.addAll(this.model.turnCombinedCards);
         this.model.turnCombinedCards.clear();
 
+        removeAllListeners();
+
         if (this.model.playCard != null) {
             playCardToBoard();
         }
@@ -38,7 +42,23 @@ public class EndButtonListener extends ClickListener {
         this.model.buttons.endButton.setVisible(false);
 
         this.model.states.game = GameState.NEXT_TURN;
-        this.model.states.turn = TurnState.NONE;
+        this.model.states.turn = TurnState.INIT_PLAY_CARDS;
+    }
+
+    private void removeAllListeners() {
+        for (CardHolder cardHolder : this.model.cardHolders) {
+            User user = (User)cardHolder;
+            removeListeners(user.boardCards);
+            removeListeners(user.tricks);
+        }
+        removeListeners(this.model.table.playCards);
+        removeListeners(this.model.player.playCards);
+    }
+
+    private void removeListeners(List<Card> cards) {
+        for (Card card : cards) {
+            card.getListeners().clear();
+        }
     }
 
     private void playCardToBoard() {
@@ -49,7 +69,7 @@ public class EndButtonListener extends ClickListener {
 
     private void movePlayCard(Card card) {
         card.toFront();
-        Tween.to(card, GameObject.ROTATION_XY, 0.2f).
+        Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
                 start(this.tweenManager);
     }

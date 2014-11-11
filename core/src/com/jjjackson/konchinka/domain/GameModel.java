@@ -1,5 +1,6 @@
 package com.jjjackson.konchinka.domain;
 
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import java.util.ArrayList;
@@ -21,4 +22,5 @@ public class GameModel {
     public List<Card> turnCombinedCards = new ArrayList<>();
     public boolean isTrickTaken;
     public Skin skin;
+    public Stage stage;
 }

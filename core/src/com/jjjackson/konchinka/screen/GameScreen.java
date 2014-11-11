@@ -3,8 +3,10 @@ package com.jjjackson.konchinka.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.GameController;
 import com.jjjackson.konchinka.GameRenderer;
@@ -30,6 +32,7 @@ public class GameScreen implements Screen {
         this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/cards.pack")));
         GameModel gameModel = initModel();
         gameModel.skin = this.skin;
+        gameModel.stage = this.stage;
         this.gameController = new GameController(gameModel);
         this.gameRenderer = new GameRenderer(this.gameController.model, this.stage, this.skin);
     }

@@ -13,7 +13,7 @@ public class PositionCalculator {
 
     public static void calcLeft(int cardNumber, Point destination) {
         destination.x = 0;
-        destination.y = 400 - cardNumber * 25;
+        destination.y = 369 - cardNumber * 25;
     }
 
     public static void calcBottom(int cardNumber, Point destination) {
@@ -23,7 +23,7 @@ public class PositionCalculator {
 
     public static void calcRight(int cardNumber, Point destination) {
         destination.x = 480 - GameConstants.CARD_WIDTH;
-        destination.y = 400 - cardNumber * 25;
+        destination.y = 369 - cardNumber * 25;
     }
 
     public static void calcCenter(int cardNumber, Point destination, boolean shiftVertically) {
