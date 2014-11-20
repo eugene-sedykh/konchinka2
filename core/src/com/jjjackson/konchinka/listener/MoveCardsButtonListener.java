@@ -82,7 +82,9 @@ public abstract class MoveCardsButtonListener extends ClickListener {
 
     private void disableCards(List<Card> cards) {
         for (Card card : cards) {
-            card.setTouchable(Touchable.disabled);
+            if (!this.model.turnCombinedCards.contains(card)) {
+                card.setTouchable(Touchable.disabled);
+            }
         }
     }
 

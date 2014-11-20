@@ -31,6 +31,7 @@ public class EndButtonListener extends ClickListener {
 
         this.model.player.boardCards.addAll(this.model.turnCombinedCards);
         this.model.turnCombinedCards.clear();
+        this.model.isTrickTaken = false;
 
         removeAllListeners();
 

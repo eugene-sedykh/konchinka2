@@ -22,7 +22,7 @@ public class GameObjectHandlerFactory {
 
     public GameObjectHandler get(GameState gameState) {
         switch (gameState) {
-            case NONE:
+            case DEAL:
                 return this.packHandler;
             case NEXT_TURN:
                 return this.nextTurnHandler;

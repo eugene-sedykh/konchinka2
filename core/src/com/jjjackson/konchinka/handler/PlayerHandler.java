@@ -4,14 +4,12 @@ import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
-import com.jjjackson.konchinka.domain.Card;
-import com.jjjackson.konchinka.domain.GameModel;
-import com.jjjackson.konchinka.domain.GameObject;
-import com.jjjackson.konchinka.domain.User;
+import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.listener.EndButtonListener;
 import com.jjjackson.konchinka.listener.SortButtonListener;
 import com.jjjackson.konchinka.listener.TrickButtonListener;
+import com.jjjackson.konchinka.util.PlayerUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +38,9 @@ public class PlayerHandler extends GameObjectHandler {
                 this.model.states.turn = TurnState.INIT_PLAY_CARDS;
                 break;
             case INIT_PLAY_CARDS:
+                this.combinedCards.clear();
                 addPlayCardListeners(this.model.player.playCards);
+                PlayerUtil.enablePlayer(this.model.currentPlayer);
                 this.model.states.turn = TurnState.WAIT;
                 break;
         }
@@ -74,7 +74,7 @@ public class PlayerHandler extends GameObjectHandler {
                         }
 
                         addSingleClickListener(getTouchableCards());
-                        if (card.isJack()) {
+                        if (card.isJack() || isLastTurn()) {
                             for (Card playCard : model.table.playCards) {
                                 playCard.getListeners().clear();
                             }

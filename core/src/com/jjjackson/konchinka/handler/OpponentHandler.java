@@ -8,6 +8,7 @@ import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.CpuTurn;
 import com.jjjackson.konchinka.domain.state.GameState;
+import com.jjjackson.konchinka.util.PlayerUtil;
 import com.jjjackson.konchinka.util.PositionCalculator;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
 public class OpponentHandler extends GameObjectHandler {
 
     private Card playCard;
-    private List<Card> combinedCards;
+    private List<Card> combinedCards = new ArrayList<>();
     private List<Card> turnCombinedCards = new ArrayList<>();
     private List<Card> initialTable;
     private List<Card> buffer = new ArrayList<>();
@@ -31,6 +32,7 @@ public class OpponentHandler extends GameObjectHandler {
     public void handle() {
         switch (this.model.states.cpuTurn) {
             case NONE:
+                PlayerUtil.enablePlayer(this.model.currentPlayer);
                 this.model.states.cpuTurn = CpuTurn.CHOOSE_PLAY_CARD;
                 break;
             case CHOOSE_PLAY_CARD:
@@ -183,7 +185,7 @@ public class OpponentHandler extends GameObjectHandler {
             this.buffer.add(card);
             tween.start(this.tweenManager);
         } else {
-            if (this.buffer.containsAll(this.initialTable) && !this.initialTable.isEmpty()) {
+            if (this.buffer.containsAll(this.initialTable) && !this.initialTable.isEmpty() || isLastTurn()) {
                 sortedCards.get(sortedCards.size() - 1).mark();
                 this.model.stage.getRoot().addListener(new ClickListener() {
                     @Override
@@ -206,7 +208,7 @@ public class OpponentHandler extends GameObjectHandler {
     }
 
     private boolean needTakeTrick() {
-        return this.turnCombinedCards.containsAll(this.initialTable);
+        return this.turnCombinedCards.containsAll(this.initialTable) && !this.initialTable.isEmpty() || isLastTurn();
     }
 
     private void takeTrick(final Card trick, CardPosition cardPosition, final List<Card> sortedCards) {

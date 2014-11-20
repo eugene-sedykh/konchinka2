@@ -60,4 +60,12 @@ public abstract class GameObjectHandler {
                     }
                 }).delay(GameConstants.PLAY_CARD_TO_TABLE_DELAY);
     }
+
+    protected boolean isLastTurn() {
+        if (!this.model.cards.isEmpty()) return false;
+        for (CardHolder cardHolder : this.model.cardHolders) {
+            if (!cardHolder.playCards.isEmpty()) return false;
+        }
+        return true;
+    }
 }

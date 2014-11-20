@@ -23,4 +23,5 @@ public class GameModel {
     public boolean isTrickTaken;
     public Skin skin;
     public Stage stage;
+    public int turnCount = 1;
 }

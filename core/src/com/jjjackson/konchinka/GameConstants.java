@@ -59,8 +59,8 @@ public class GameConstants {
     public static final int TRICK_RIGHT_X = 409;
     public static final int TRICK_RIGHT_Y = 581;
 
-    public static final float CARD_SPEED = 0.3f;
+    public static final float CARD_SPEED = 0.2f;
     public static final float DEALING_SPEED = 0.2f;
 
-    public static final float PLAY_CARD_TO_TABLE_DELAY = 0.7f;
+    public static final float PLAY_CARD_TO_TABLE_DELAY = 0.5f;
 }

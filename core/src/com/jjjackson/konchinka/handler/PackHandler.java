@@ -122,7 +122,7 @@ public class PackHandler extends GameObjectHandler {
     private void dealCards() {
         if (!this.isCardMoving) {
             if (isCardsDealt()) {
-                if (isJackOnTable()) {
+                if (isJackOnTable() && this.model.turnCount == 1) {
                     this.model.states.deal = DealState.JACK_IN;
                     return;
                 }
@@ -140,6 +140,7 @@ public class PackHandler extends GameObjectHandler {
 
             this.isCardMoving = true;
         } else if (!this.isMovementInit) {
+            this.movingCard.toFront();
             Tween.to(this.movingCard, GameObject.POSITION_XY, GameConstants.DEALING_SPEED).
                     target(this.movingCard.endX, this.movingCard.endY).
                     start(this.tweenManager).
@@ -205,7 +206,12 @@ public class PackHandler extends GameObjectHandler {
     }
 
     private boolean isCardsDealt() {
-        return this.model.cardHolders.get(this.model.cardHolders.size() - 1).playCards.size() == 4;
+        for (CardHolder cardHolder : this.model.cardHolders) {
+            if (cardHolder.playCards.size() != 4) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void moveJackOut() {

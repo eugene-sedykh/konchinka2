@@ -125,7 +125,7 @@ public class CardCombinator {
             if (combinations.isEmpty()) continue;
             cardCombinations.put(playerCard, combinations);
         }
-        if (cardCombinations.isEmpty() || shouldPass(playerCards, cardCombinations)) {
+        if (cardCombinations.isEmpty() || shouldPass(playerCards, cardCombinations, table.playCards)) {
             CardCombination emptyCombination = getEmptyCombination(playerCards);
             Gdx.app.log("Empty", emptyCombination.card.face);
             if (emptyCombination.card.isJack()) {
@@ -136,8 +136,9 @@ public class CardCombinator {
         return chooseCombination(getJack(playerCards), cardCombinations, table);
     }
 
-    private boolean shouldPass(List<Card> playerCards, Map<Card, List<List<Card>>> cardCombinations) {
-        return playerCards.size() > 1 && areJacksOnly(cardCombinations.keySet()) && !isValuableCardPresent(cardCombinations.values());
+    private boolean shouldPass(List<Card> playerCards, Map<Card, List<List<Card>>> cardCombinations, List<Card> table) {
+        return playerCards.size() > 1 && areJacksOnly(cardCombinations.keySet()) &&
+                !isValuableCardPresent(cardCombinations.values()) && table.isEmpty();
     }
 
     private boolean isValuableCardPresent(Collection<List<List<Card>>> combinations) {
