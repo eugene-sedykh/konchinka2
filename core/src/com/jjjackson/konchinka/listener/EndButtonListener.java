@@ -71,7 +71,7 @@ public class EndButtonListener extends ClickListener {
     private void movePlayCard(Card card) {
         card.toFront();
         Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
+                target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
                 start(this.tweenManager);
     }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 public class OpponentHandler extends GameObjectHandler {
 
     private Card playCard;
-    private List<Card> combinedCards = new ArrayList<>();
+    private List<Card> combinedCards = Collections.synchronizedList(new ArrayList<Card>());
     private List<Card> turnCombinedCards = new ArrayList<>();
     private List<Card> initialTable;
     private List<Card> buffer = new ArrayList<>();

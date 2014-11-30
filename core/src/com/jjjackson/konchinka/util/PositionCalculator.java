@@ -13,7 +13,7 @@ public class PositionCalculator {
 
     public static void calcLeft(int cardNumber, Point destination) {
         destination.x = 0;
-        destination.y = 369 - cardNumber * 25;
+        destination.y = GameConstants.PLAY_CARD_LEFT_Y - cardNumber * 25;
     }
 
     public static void calcBottom(int cardNumber, Point destination) {
@@ -23,7 +23,7 @@ public class PositionCalculator {
 
     public static void calcRight(int cardNumber, Point destination) {
         destination.x = 480 - GameConstants.CARD_WIDTH;
-        destination.y = 369 - cardNumber * 25;
+        destination.y = GameConstants.PLAY_CARD_RIGHT_Y - cardNumber * 25;
     }
 
     public static void calcCenter(int cardNumber, Point destination, boolean shiftVertically) {
@@ -55,6 +55,10 @@ public class PositionCalculator {
                 destination.x = GameConstants.BOARD_RIGHT_X;
                 destination.y = GameConstants.BOARD_RIGHT_Y;
                 break;
+            case BOTTOM:
+                destination.x = GameConstants.BOARD_BOTTOM_X;
+                destination.y = GameConstants.BOARD_BOTTOM_Y;
+                break;
         }
         return destination;
     }
@@ -77,6 +81,10 @@ public class PositionCalculator {
             case RIGHT:
                 destination.x = GameConstants.TRICK_RIGHT_X;
                 destination.y = GameConstants.TRICK_RIGHT_Y;
+                break;
+            case BOTTOM:
+                destination.x = GameConstants.TRICK_BOTTOM_X;
+                destination.y = GameConstants.TRICK_BOTTOM_Y;
                 break;
         }
         return destination;

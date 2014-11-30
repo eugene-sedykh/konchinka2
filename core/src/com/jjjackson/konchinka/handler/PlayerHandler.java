@@ -95,7 +95,7 @@ public class PlayerHandler extends GameObjectHandler {
             public void clicked(InputEvent event, float x, float y) {
                 card.toFront();
                 Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                        target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
+                        target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
                         start(tweenManager).
                         setCallback(new TweenCallback() {
                             @Override
@@ -187,18 +187,27 @@ public class PlayerHandler extends GameObjectHandler {
     }
 
     private void enableEndButtons() {
-        if (this.playCardValue != GameConstants.JACK_VALUE) {
+        if (this.playCardValue != GameConstants.JACK_VALUE ) {
             if (shouldShowTrickButton()) {
-                model.buttons.trickButton.setVisible(true);
-                model.buttons.trickButton.toFront();
+                showTrickButton();
             } else {
-                model.buttons.endButton.setVisible(true);
-                model.buttons.endButton.toFront();
+                showEndButton();
             }
         } else if (shouldShowTrickButton()) {
-            model.buttons.trickButton.setVisible(true);
-            model.buttons.trickButton.toFront();
+            showTrickButton();
+        } else if (this.model.table.playCards.isEmpty()) {
+            showEndButton();
         }
+    }
+
+    private void showTrickButton() {
+        model.buttons.trickButton.setVisible(true);
+        model.buttons.trickButton.toFront();
+    }
+
+    private void showEndButton() {
+        model.buttons.endButton.setVisible(true);
+        model.buttons.endButton.toFront();
     }
 
     private boolean shouldShowTrickButton() {
@@ -209,7 +218,7 @@ public class PlayerHandler extends GameObjectHandler {
     private Tween initTween(Card card) {
         card.toFront();
         return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
+                target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
                 start(this.tweenManager);
     }
 
@@ -310,7 +319,7 @@ public class PlayerHandler extends GameObjectHandler {
         card.unmark();
         card.toFront();
         Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                target(GameConstants.BOTTOM_BOARD_X, GameConstants.BOTTOM_BOARD_Y, 90).
+                target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
                 start(this.tweenManager).
                 setCallback(new TweenCallback() {
                     @Override

@@ -24,33 +24,10 @@ public class PlayerUtil {
     }
 
     public static void enablePlayer(CardHolder player) {
-//        switchColorPlayer(player, true);
+        ((User)player).activate();
     }
 
     public static void disablePlayer(CardHolder player) {
-//        switchColorPlayer(player, false);
-    }
-
-    private static void switchColorPlayer(CardHolder player, boolean isEnabled) {
-        User user = (User) player;
-        for (Card playCard : user.playCards) {
-            switchColorCard(isEnabled, playCard);
-        }
-        switchColorCards(user.tricks, isEnabled);
-        switchColorCards(user.boardCards, isEnabled);
-    }
-
-    private static void switchColorCards(List<Card> cards, boolean isEnabled) {
-        if (!cards.isEmpty()) {
-            switchColorCard(isEnabled, cards.get(cards.size() - 1));
-        }
-    }
-
-    private static void switchColorCard(boolean isEnabled, Card playCard) {
-        if (isEnabled) {
-//            playCard.setActiveColor();
-        } else {
-//            playCard.unmark();
-        }
+        ((User)player).deactivate();
     }
 }

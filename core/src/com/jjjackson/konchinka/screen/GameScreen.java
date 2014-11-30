@@ -67,18 +67,18 @@ public class GameScreen implements Screen {
         model.table = new Table();
         switch (playersNumber) {
             case 2:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, this.stage));
                 break;
             case 3:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, this.stage));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, this.stage));
                 break;
             case 4:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, this.stage));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, this.stage));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, this.stage));
         }
-        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM);
+        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM, this.stage);
 
         model.cardHolders = new ArrayList<>();
         model.cardHolders.addAll(model.opponents);

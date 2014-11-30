@@ -13,9 +13,6 @@ public class GameConstants {
     public static final int PLAY_CARD_X = 205;
     public static final int PLAY_CARD_Y = 225;
 
-    public static final int BOTTOM_BOARD_X = 288;
-    public static final int BOTTOM_BOARD_Y = 130;
-
     public static final int TOP_BOARD_Y = 125;
 
     public static final int CARD_WIDTH = 71;
@@ -32,32 +29,37 @@ public class GameConstants {
 
     public static final int JACK_VALUE = 11;
 
-    public static final int BOTTOM_TRICK_X = 10;
-    public static final int BOTTOM_TRICK_Y = 0;
     public static final int LEFT_TRICK_X = 0;
     public static final int LEFT_TRICK_Y = 110;
     public static final int TOP_TRICK_X = 400;
     public static final int TOP_TRICK_Y = 0;
     public static final int RIGHT_TRICK_X = 409;
     public static final int RIGHT_TRICK_Y = 110;
-
     public static final int PACK_X = 220;
+
     public static final int PACK_BOTTOM_HIDE_Y = -CARD_HEIGHT;
     public static final int PACK_BOTTOM_SHOW_Y = 200;
 
     public static final int BOARD_LEFT_X = 0;
-    public static final int BOARD_LEFT_Y = 475;
+    public static final int BOARD_LEFT_Y = 294;
     public static final int BOARD_TOP_X = 288;
     public static final int BOARD_TOP_Y = 599;
     public static final int BOARD_RIGHT_X = 409;
-    public static final int BOARD_RIGHT_Y = 475;
+    public static final int BOARD_RIGHT_Y = 294;
+    public static final int BOARD_BOTTOM_X = 288;
+    public static final int BOARD_BOTTOM_Y = 130;
 
     public static final int TRICK_LEFT_X = 0;
-    public static final int TRICK_LEFT_Y = 581;
+    public static final int TRICK_LEFT_Y = 400;
     public static final int TRICK_TOP_X = 399;
     public static final int TRICK_TOP_Y = 704;
     public static final int TRICK_RIGHT_X = 409;
-    public static final int TRICK_RIGHT_Y = 581;
+    public static final int TRICK_RIGHT_Y = 400;
+    public static final int TRICK_BOTTOM_X = 10;
+    public static final int TRICK_BOTTOM_Y = 0;
+
+    public static final int PLAY_CARD_RIGHT_Y = 581;
+    public static final int PLAY_CARD_LEFT_Y = 581;
 
     public static final float CARD_SPEED = 0.2f;
     public static final float DEALING_SPEED = 0.2f;

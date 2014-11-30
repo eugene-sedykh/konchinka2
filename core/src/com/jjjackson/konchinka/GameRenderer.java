@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -22,24 +23,30 @@ public class GameRenderer {
         this.stage = stage;
         this.skin = skin;
 
-        this.stage.addActor(this.model.pack);
+        Group firstGroup = new Group();
+        Group secondGroup = new Group();
+
+        this.stage.addActor(firstGroup);
+        this.stage.addActor(secondGroup);
+
+        firstGroup.addActor(this.model.pack);
 
         for (Card card : this.model.cards) {
-            this.stage.addActor(card);
+            firstGroup.addActor(card);
         }
 
-        initGameButtons(this.stage);
-        initSortFog(this.stage);
+        initGameButtons(firstGroup);
+        initSortFog(secondGroup);
     }
 
-    private void initSortFog(Stage stage) {
+    private void initSortFog(Group stage) {
         Fog fog = new Fog();
         fog.setVisible(false);
         this.model.fog = fog;
         stage.addActor(fog);
     }
 
-    private void initGameButtons(Stage stage) {
+    private void initGameButtons(Group stage) {
         TextButton.TextButtonStyle textButtonStyle = createButtonStyle();
         TextButton sortButton = createButton("Sort", textButtonStyle, 100, 150);
         TextButton endSortButton = createButton("Done", textButtonStyle, 100, 150);
