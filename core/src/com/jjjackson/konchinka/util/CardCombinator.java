@@ -173,7 +173,7 @@ public class CardCombinator {
         if (cards.size() < 2) return cards.get(0);
 
         Collections.sort(cards, new CardsSorter());
-        return cards.get(cards.size() - 1);
+        return cards.get(0);
     }
 
     private CardCombination chooseCombination(Card jack, Map<Card, List<List<Card>>> cardCombinations, Table table) {
@@ -184,7 +184,12 @@ public class CardCombinator {
         }
         if (jack != null && isValuableCardPresent(table.playCards)) {
             Gdx.app.log("Jack", "true");
-            return buildJackCombination(jack, cardCombinations);
+            CardCombination cardCombination = buildJackCombination(jack, cardCombinations);
+            if (cardCombination.combination == null) {
+                cardCombination.combination = table.playCards;
+            }
+
+            return cardCombination;
         }
         Map<Card, List<List<Card>>> combinationsWithValuableCards = getCombinationsWithValuableCards(cardCombinations);
         if (!combinationsWithValuableCards.isEmpty()) {

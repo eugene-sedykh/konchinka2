@@ -1,5 +1,6 @@
 package com.jjjackson.konchinka.domain;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
@@ -8,7 +9,6 @@ import java.util.List;
 
 public class GameModel {
     public Pack pack;
-    public List<Card> cards = new ArrayList<>();
     public States states;
     public Table table;
     public List<User> opponents = new ArrayList<>();
@@ -24,4 +24,5 @@ public class GameModel {
     public Skin skin;
     public Stage stage;
     public int turnCount = 1;
+    public BitmapFont font;
 }

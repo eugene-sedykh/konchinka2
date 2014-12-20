@@ -62,7 +62,7 @@ public abstract class GameObjectHandler {
     }
 
     protected boolean isLastTurn() {
-        if (!this.model.cards.isEmpty()) return false;
+        if (!this.model.pack.cards.isEmpty()) return false;
         for (CardHolder cardHolder : this.model.cardHolders) {
             if (!cardHolder.playCards.isEmpty()) return false;
         }

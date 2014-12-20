@@ -1,10 +1,8 @@
 package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.TweenManager;
-import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.CardHolder;
 import com.jjjackson.konchinka.domain.GameModel;
-import com.jjjackson.konchinka.domain.User;
 import com.jjjackson.konchinka.domain.state.DealState;
 import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.util.PlayerUtil;
@@ -20,7 +18,7 @@ public class NextTurnHandler extends GameObjectHandler {
     @Override
     public void handle() {
         if (isLastTurn()) {
-            this.model.states.game = GameState.CALC_RESULT;
+            this.model.states.game = GameState.GAME_RESULT;
             return;
         }
 

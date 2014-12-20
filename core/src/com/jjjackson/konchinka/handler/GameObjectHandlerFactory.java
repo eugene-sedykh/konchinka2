@@ -11,6 +11,7 @@ public class GameObjectHandlerFactory {
     private final GameObjectHandler playerHandler;
     private final GameObjectHandler nextTurnHandler;
     private final GameObjectHandler opponentHandler;
+    private final GameObjectHandler resultHandler;
 
     public GameObjectHandlerFactory(GameModel model, TweenManager tweenManager) {
         this.model = model;
@@ -18,6 +19,7 @@ public class GameObjectHandlerFactory {
         this.playerHandler = new PlayerHandler(model, tweenManager);
         this.nextTurnHandler = new NextTurnHandler(model, tweenManager);
         this.opponentHandler = new OpponentHandler(model, tweenManager);
+        this.resultHandler = new ResultHandler(model, tweenManager);
     }
 
     public GameObjectHandler get(GameState gameState) {
@@ -28,6 +30,8 @@ public class GameObjectHandlerFactory {
                 return this.nextTurnHandler;
             case TURN:
                 return this.model.currentPlayer == this.model.player ? this.playerHandler : this.opponentHandler;
+            case GAME_RESULT:
+                return this.resultHandler;
             default:
                 assert false;
                 return null;

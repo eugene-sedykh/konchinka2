@@ -26,7 +26,7 @@ public class MainMenuScreen implements Screen {
         this.konchinkaGame = konchinkaGame;
         this.stage = new Stage();
 
-        this.font = new BitmapFont(Gdx.files.internal("font/calibri.fnt"), Gdx.files.internal("font/calibri.png"), false);
+        this.font = new BitmapFont(Gdx.files.internal("font/default.fnt"), Gdx.files.internal("font/default.png"), false);
         this.skin = new Skin();
         this.buttonAtlas = new TextureAtlas(Gdx.files.internal("buttons/menu_button.pack"));
         this.skin.addRegions(buttonAtlas);

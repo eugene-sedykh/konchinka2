@@ -11,6 +11,7 @@ public class States {
     public TurnState turn = TurnState.INIT_BUTTONS;
     public DealState deal = DealState.PACK_IN;
     public CpuTurn cpuTurn = CpuTurn.NONE;
+    public ResultState result = ResultState.NONE;
 
     public boolean isFaded;
     public boolean isSortButtonShown;

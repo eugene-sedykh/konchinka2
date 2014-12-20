@@ -15,10 +15,12 @@ public class EndButtonListener extends ClickListener {
 
     private GameModel model;
     private TweenManager tweenManager;
+    private List<Card> combinedCards;
 
-    public EndButtonListener(GameModel model, TweenManager tweenManager) {
+    public EndButtonListener(GameModel model, TweenManager tweenManager, List<Card> combinedCards) {
         this.model = model;
         this.tweenManager = tweenManager;
+        this.combinedCards = combinedCards;
     }
 
     @Override
@@ -32,6 +34,10 @@ public class EndButtonListener extends ClickListener {
         this.model.player.boardCards.addAll(this.model.turnCombinedCards);
         this.model.turnCombinedCards.clear();
         this.model.isTrickTaken = false;
+
+        for (Card combinedCard : this.combinedCards) {
+            combinedCard.unmark();
+        }
 
         removeAllListeners();
 

@@ -129,14 +129,11 @@ public class PackHandler extends GameObjectHandler {
                 this.model.states.deal = DealState.PACK_OUT;
                 return;
             }
-            this.movingCard = this.model.cards.remove(0);
-            initStartPosition(this.movingCard, (int) this.model.pack.getX(), (int) this.model.pack.getY());
+            this.movingCard = this.model.pack.cards.remove(0);
+            this.model.pack.refreshTexture();
+            initStartPosition(this.movingCard, (int) (this.model.pack.getX() + this.model.pack.getWidth() - GameConstants.CARD_WIDTH),
+                    (int) (this.model.pack.getY() + this.model.pack.getHeight() - GameConstants.CARD_HEIGHT));
             initEndPosition(this.movingCard);
-
-            CardHolder currentPlayer = getCurrentPlayer();
-            if (currentPlayer == this.model.player || currentPlayer instanceof Table) {
-                this.movingCard.showFace();
-            }
 
             this.isCardMoving = true;
         } else if (!this.isMovementInit) {
@@ -153,6 +150,9 @@ public class PackHandler extends GameObjectHandler {
                             isMovementInit = false;
                             CardHolder cardHolder = getCurrentPlayer();
                             cardHolder.playCards.add(movingCard);
+                            if (cardHolder == model.player || cardHolder instanceof Table) {
+                                movingCard.showFace();
+                            }
                             PlayerUtil.switchPlayer(model);
                         }
                     });
@@ -180,13 +180,13 @@ public class PackHandler extends GameObjectHandler {
                 PositionCalculator.calcBottom(cardNumber, destination);
                 break;
             case LEFT:
-                PositionCalculator.calcLeft(cardNumber, destination);
+                PositionCalculator.calcLeft(cardNumber, destination, this.model.opponents.size());
                 break;
             case TOP:
                 PositionCalculator.calcTop(cardNumber, destination);
                 break;
             case RIGHT:
-                PositionCalculator.calcRight(cardNumber, destination);
+                PositionCalculator.calcRight(cardNumber, destination, this.model.opponents.size());
                 break;
             case CENTER:
                 this.cardMover.changeCenterCardsPosition(player.playCards, true);
@@ -216,7 +216,7 @@ public class PackHandler extends GameObjectHandler {
 
     private void moveJackOut() {
         if (!this.isCardMoving) {
-            this.movingCard = this.model.cards.remove(0);
+            this.movingCard = this.model.pack.cards.remove(0);
             initStartPosition(this.movingCard, (int) this.model.pack.getX(), (int) this.model.pack.getY());
             initJackEndPosition(this.movingCard, this.jackX, this.jackY);
             this.movingCard.showFace();
@@ -238,7 +238,6 @@ public class PackHandler extends GameObjectHandler {
                     });
             this.isMovementInit = true;
         }
-
     }
 
     private void moveJackIn() {
@@ -261,7 +260,7 @@ public class PackHandler extends GameObjectHandler {
                             model.states.deal = DealState.JACK_OUT;
                             isCardMoving = false;
                             isMovementInit = false;
-                            model.cards.add(getRandomPosition(10, 30), movingCard);
+                            model.pack.cards.add(getRandomPosition(10, 30), movingCard);
                             model.table.playCards.remove(movingCard);
                             movingCard.setX(-100);
                             movingCard.setY(-100);

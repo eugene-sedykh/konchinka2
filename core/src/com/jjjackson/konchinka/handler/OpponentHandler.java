@@ -13,7 +13,6 @@ import com.jjjackson.konchinka.util.PositionCalculator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class OpponentHandler extends GameObjectHandler {
@@ -96,7 +95,7 @@ public class OpponentHandler extends GameObjectHandler {
         removeStageListeners();
         Timeline sequence = Timeline.createSequence();
         CardHolder user = getCurrentPlayer();
-        Point destination = PositionCalculator.calcBoard(user.cardPosition);
+        Point destination = PositionCalculator.calcBoard(user.cardPosition, this.model.opponents.size());
         int degree = PositionCalculator.calcRotation(user.cardPosition);
         for (Card card : this.combinedCards) {
             sequence.push(initTake(card, destination, degree));
@@ -130,7 +129,7 @@ public class OpponentHandler extends GameObjectHandler {
 
     private void takePlayCard() {
         CardHolder user = getCurrentPlayer();
-        Point destination = PositionCalculator.calcBoard(user.cardPosition);
+        Point destination = PositionCalculator.calcBoard(user.cardPosition, this.model.opponents.size());
         int degree = PositionCalculator.calcRotation(user.cardPosition);
         this.playCard.toFront();
         Tween.to(this.playCard, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
@@ -186,7 +185,7 @@ public class OpponentHandler extends GameObjectHandler {
             tween.start(this.tweenManager);
         } else {
             if (this.buffer.containsAll(this.initialTable) && !this.initialTable.isEmpty() || isLastTurn()) {
-                sortedCards.get(sortedCards.size() - 1).mark();
+                sortedCards.get(0).mark();
                 this.model.stage.getRoot().addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
@@ -200,7 +199,7 @@ public class OpponentHandler extends GameObjectHandler {
     }
 
     private void initTrickTaking(List<Card> sortedCards) {
-        Card trick = sortedCards.remove(sortedCards.size() - 1);
+        Card trick = sortedCards.remove(0);
         trick.unmark();
         this.buffer.remove(trick);
         ((User)this.model.currentPlayer).tricks.add(trick);
@@ -213,7 +212,7 @@ public class OpponentHandler extends GameObjectHandler {
 
     private void takeTrick(final Card trick, CardPosition cardPosition, final List<Card> sortedCards) {
         trick.toFront();
-        Point destination = PositionCalculator.calcTrick(cardPosition);
+        Point destination = PositionCalculator.calcTrick(cardPosition, this.model.opponents.size());
         Tween.to(trick, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, 0).
                 setCallbackTriggers(TweenCallback.COMPLETE).
@@ -247,7 +246,7 @@ public class OpponentHandler extends GameObjectHandler {
 
     private void moveCardsToPlayer(List<Card> sortedCards) {
         if (!sortedCards.isEmpty()) {
-            Card card = sortedCards.remove(sortedCards.size() - 1);
+            Card card = sortedCards.remove(0);
             Tween tween = initBackTween(card, sortedCards);
             this.buffer.remove(card);
             this.turnCombinedCards.add(card);
@@ -259,7 +258,7 @@ public class OpponentHandler extends GameObjectHandler {
 
     private Tween initBackTween(Card card, final List<Card> sortedCards) {
         card.toFront();
-        Point destination = PositionCalculator.calcBoard(this.model.currentPlayer.cardPosition);
+        Point destination = PositionCalculator.calcBoard(this.model.currentPlayer.cardPosition, this.model.opponents.size());
         int degree = PositionCalculator.calcRotation(this.model.currentPlayer.cardPosition);
         return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(destination.x, destination.y, degree).

@@ -27,6 +27,7 @@ public class GameConstants {
     public static final int END_BUTTON_X = 330;
     public static final int END_BUTTON_Y = 600;
 
+    public static final int ACE_VALUE = 1;
     public static final int JACK_VALUE = 11;
 
     public static final int LEFT_TRICK_X = 0;
@@ -65,4 +66,20 @@ public class GameConstants {
     public static final float DEALING_SPEED = 0.2f;
 
     public static final float PLAY_CARD_TO_TABLE_DELAY = 0.5f;
+
+    public static final String BOTTOM_LAYER_NAME = "bottom";
+    public static final String TOP_LAYER_NAME = "top";
+    public static final String RESULT_LAYER_NAME = "result";
+
+    public static final int AVATARS_CENTER_Y = 600;
+    public static final int AVATAR_WIDTH = 96;
+    public static final int AVATAR_HEIGHT = 96;
+    public static final float AVATAR_SPEED = 1;
+    public static final int AVATAR_X0 = 100;
+
+    public static final float RESULT_LABEL_X_SHIFT = 50;
+    public static final float RESULT_LABEL_Y_SHIFT = 70;
+    public static final float RESULT_IMAGE_X = 30;
+
+    public static final int SHIFT_Y = 85;
 }

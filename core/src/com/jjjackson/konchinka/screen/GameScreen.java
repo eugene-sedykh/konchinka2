@@ -3,6 +3,8 @@ package com.jjjackson.konchinka.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -28,7 +30,7 @@ public class GameScreen implements Screen {
     public GameScreen(KonchinkaGame konchinkaGame) {
         this.konchinkaGame = konchinkaGame;
         this.stage = new Stage();
-        this.skin = new Skin();
+        this.skin = new Skin(Gdx.files.internal("uiskin.json"));
         this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/cards.pack")));
         GameModel gameModel = initModel();
         gameModel.skin = this.skin;
@@ -48,37 +50,38 @@ public class GameScreen implements Screen {
     }
 
     private void initPack(GameModel gameModel) {
-        gameModel.pack = new Pack(this.skin, "b1fv");
+        gameModel.pack = new Pack(this.skin, "full_pack_diagonal");
         gameModel.pack.setX(GameConstants.PACK_X);
         gameModel.pack.setY(GameConstants.PACK_BOTTOM_HIDE_Y);
     }
 
     private void initCards(GameModel gameModel) {
         for (int i = 1; i < 14; i++) {
-            gameModel.cards.add(new Card(CardSuit.CLUBS, i, this.skin));
-            gameModel.cards.add(new Card(CardSuit.DIAMONDS, i, this.skin));
-            gameModel.cards.add(new Card(CardSuit.HEARTS, i, this.skin));
-            gameModel.cards.add(new Card(CardSuit.SPADES, i, this.skin));
+            gameModel.pack.cards.add(new Card(CardSuit.CLUBS, i, this.skin));
+            gameModel.pack.cards.add(new Card(CardSuit.DIAMONDS, i, this.skin));
+            gameModel.pack.cards.add(new Card(CardSuit.HEARTS, i, this.skin));
+            gameModel.pack.cards.add(new Card(CardSuit.SPADES, i, this.skin));
         }
-        Collections.shuffle(gameModel.cards);
+        Collections.shuffle(gameModel.pack.cards);
     }
 
     private void initPlayers(GameModel model, int playersNumber, final CardPosition dealerPosition) {
         model.table = new Table();
+
         switch (playersNumber) {
             case 2:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, this.stage));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, 1));
                 break;
             case 3:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, this.stage));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, this.stage));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, 2));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, 2));
                 break;
             case 4:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, this.stage));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, this.stage));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, this.stage));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, 3));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, 3));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, 3));
         }
-        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM, this.stage);
+        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM, model.opponents.size());
 
         model.cardHolders = new ArrayList<>();
         model.cardHolders.addAll(model.opponents);

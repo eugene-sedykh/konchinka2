@@ -33,7 +33,7 @@ public class PlayerHandler extends GameObjectHandler {
                         this.cardMover, this.model.buttons.sortButton));
                 model.buttons.trickButton.addListener(new TrickButtonListener(this.model, this.tweenManager,
                         this.cardMover, this.model.buttons.trickButton));
-                model.buttons.endButton.addListener(new EndButtonListener(this.model, this.tweenManager));
+                model.buttons.endButton.addListener(new EndButtonListener(this.model, this.tweenManager, this.combinedCards));
 
                 this.model.states.turn = TurnState.INIT_PLAY_CARDS;
                 break;
