@@ -1,6 +1,7 @@
 package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.*;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -146,9 +147,9 @@ public class ResultHandler extends GameObjectHandler {
 
     private Label createLabel(int value, float x, float y) {
         Label label = new Label(String.valueOf(value), model.skin);
-        label.setX(x);
-        label.setY(y);
-        label.setFontScale(1f);
+        label.setX(x - 25);
+        label.setY(y + 20);
+        label.setFontScale(3f);
         return label;
     }
 

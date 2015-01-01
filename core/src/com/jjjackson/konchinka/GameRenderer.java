@@ -25,6 +25,8 @@ public class GameRenderer {
         this.skin = skin;
         this.model.font = new BitmapFont(Gdx.files.internal("font/default.fnt"), Gdx.files.internal("font/default.png"), false);
 
+        this.stage.getBatch().enableBlending();
+
         Group firstGroup = new Group();
         firstGroup.setName(GameConstants.BOTTOM_LAYER_NAME);
         Group secondGroup = new Group();
