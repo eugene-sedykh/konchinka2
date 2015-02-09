@@ -14,10 +14,11 @@ public class User extends CardHolder {
 
     public GameResult gameResult = new GameResult();
 
-    public User(UserType userType, CardPosition cardPosition, int opponentsNumber) {
+    public User(UserType userType, CardPosition cardPosition, int opponentsNumber, UserAvatar userAvatar) {
         this.userType = userType;
         this.cardPosition = cardPosition;
-        this.avatar = new UserAvatar(cardPosition, opponentsNumber);
+        this.avatar = userAvatar;
+        this.avatar.initPosition(cardPosition, opponentsNumber);
     }
 
     public void activate() {

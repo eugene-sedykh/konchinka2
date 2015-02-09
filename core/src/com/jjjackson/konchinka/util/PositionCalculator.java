@@ -1,6 +1,5 @@
 package com.jjjackson.konchinka.util;
 
-import com.badlogic.gdx.Gdx;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.CardPosition;
 import com.jjjackson.konchinka.domain.Point;
@@ -102,7 +101,6 @@ public class PositionCalculator {
 
         int avatarGap = calcAvatarGap(avatarsNumber);
         destination.x = GameConstants.AVATAR_X0 + avatarIndex * (GameConstants.AVATAR_WIDTH + avatarGap);
-        Gdx.app.log("avX", String.valueOf(destination.x));
         destination.y = GameConstants.AVATARS_CENTER_Y;
 
         return destination;

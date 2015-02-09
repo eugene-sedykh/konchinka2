@@ -7,4 +7,6 @@ public class Buttons {
     public TextButton endSortButton;
     public TextButton trickButton;
     public TextButton endButton;
+    public TextButton mainMenuButton;
+    public TextButton newGameButton;
 }

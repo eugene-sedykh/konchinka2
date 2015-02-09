@@ -3,12 +3,8 @@ package com.jjjackson.konchinka.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.GameController;
 import com.jjjackson.konchinka.GameRenderer;
@@ -18,6 +14,7 @@ import com.jjjackson.konchinka.domain.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class GameScreen implements Screen {
 
@@ -27,16 +24,20 @@ public class GameScreen implements Screen {
     private Stage stage;
     private Skin skin;
 
+    private List<UserAvatar> cpuAvatars = new ArrayList<>();
+    private UserAvatar userAvatar;
+
     public GameScreen(KonchinkaGame konchinkaGame) {
         this.konchinkaGame = konchinkaGame;
         this.stage = new Stage();
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
         this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/cards.pack")));
+        this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/avatars/avatars.pack")));
         GameModel gameModel = initModel();
         gameModel.skin = this.skin;
         gameModel.stage = this.stage;
+        this.gameRenderer = new GameRenderer(gameModel, this.stage, this.skin);
         this.gameController = new GameController(gameModel);
-        this.gameRenderer = new GameRenderer(this.gameController.model, this.stage, this.skin);
     }
 
     private GameModel initModel() {
@@ -45,6 +46,7 @@ public class GameScreen implements Screen {
         initPack(gameModel);
         initCards(gameModel);
         gameModel.dealerPosition = CardPosition.RIGHT;
+        initAvatars();
         initPlayers(gameModel, 4, gameModel.dealerPosition);
         return gameModel;
     }
@@ -65,23 +67,34 @@ public class GameScreen implements Screen {
         Collections.shuffle(gameModel.pack.cards);
     }
 
+    private void initAvatars() {
+        this.cpuAvatars.add(new UserAvatar(this.skin, "axakov"));
+        this.cpuAvatars.add(new UserAvatar(this.skin, "chehov"));
+        this.cpuAvatars.add(new UserAvatar(this.skin, "krylov"));
+        this.cpuAvatars.add(new UserAvatar(this.skin, "lermontov"));
+        this.cpuAvatars.add(new UserAvatar(this.skin, "pushkin"));
+        this.cpuAvatars.add(new UserAvatar(this.skin, "ushinskiy"));
+
+        this.userAvatar = new UserAvatar(this.skin, "user");
+    }
+
     private void initPlayers(GameModel model, int playersNumber, final CardPosition dealerPosition) {
         model.table = new Table();
 
         switch (playersNumber) {
             case 2:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, 1));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, 1, getCpuAvatar()));
                 break;
             case 3:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, 2));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, 2));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, 2, getCpuAvatar()));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, 2, getCpuAvatar()));
                 break;
             case 4:
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, 3));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, 3));
-                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, 3));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.LEFT, 3, getCpuAvatar()));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, 3, getCpuAvatar()));
+                model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, 3, getCpuAvatar()));
         }
-        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM, model.opponents.size());
+        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM, model.opponents.size(), this.userAvatar);
 
         model.cardHolders = new ArrayList<>();
         model.cardHolders.addAll(model.opponents);
@@ -92,6 +105,14 @@ public class GameScreen implements Screen {
         model.cardHolders.add(model.cardHolders.size() - 1, model.table);
 
         model.cardHolders.get(0).isCurrent = true;
+        model.currentPlayer = model.cardHolders.get(0);
+
+    }
+
+    private UserAvatar getCpuAvatar() {
+        Random random = new Random();
+        int avatarIndex = random.nextInt(this.cpuAvatars.size());
+        return this.cpuAvatars.remove(avatarIndex);
     }
 
     private void sort(List<CardHolder> cardHolders, CardPosition dealerPosition) {
@@ -137,5 +158,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+        this.stage.dispose();
+        this.skin.dispose();
+        this.gameRenderer.dispose();
     }
 }

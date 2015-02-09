@@ -12,6 +12,7 @@ public class GameObjectHandlerFactory {
     private final GameObjectHandler nextTurnHandler;
     private final GameObjectHandler opponentHandler;
     private final GameObjectHandler resultHandler;
+    private final GameObjectHandler newGameHandler;
 
     public GameObjectHandlerFactory(GameModel model, TweenManager tweenManager) {
         this.model = model;
@@ -20,6 +21,7 @@ public class GameObjectHandlerFactory {
         this.nextTurnHandler = new NextTurnHandler(model, tweenManager);
         this.opponentHandler = new OpponentHandler(model, tweenManager);
         this.resultHandler = new ResultHandler(model, tweenManager);
+        this.newGameHandler = new NewGameHandler(model, tweenManager);
     }
 
     public GameObjectHandler get(GameState gameState) {
@@ -32,9 +34,10 @@ public class GameObjectHandlerFactory {
                 return this.model.currentPlayer == this.model.player ? this.playerHandler : this.opponentHandler;
             case GAME_RESULT:
                 return this.resultHandler;
+            case NEW_GAME:
+                return this.newGameHandler;
             default:
-                assert false;
-                return null;
+                throw new AssertionError("Cannot find handler for game state: " + gameState);
         }
     }
 }

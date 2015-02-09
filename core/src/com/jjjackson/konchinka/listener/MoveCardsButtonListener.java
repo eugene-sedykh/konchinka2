@@ -99,22 +99,23 @@ public abstract class MoveCardsButtonListener extends ClickListener {
         }
     }
 
-    private Tween initBackToPlayerTween(Card card) {
-            card.toFront();
-            return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                    target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
-                    start(this.tweenManager).
-                    setCallbackTriggers(TweenCallback.COMPLETE).
-                    setCallback(new TweenCallback() {
-                        @Override
-                        public void onEvent(int type, BaseTween<?> source) {
-                            if (!sortCards.isEmpty()) {
-                                cardMover.changeCenterCardsPosition(sortCards, true, true);
-                            }
-
-                            moveSortedCards();
+    private Tween initBackToPlayerTween(final Card card) {
+        this.cardMover.showOnCardsLayer(card);
+        card.toFront();
+        return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
+                target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
+                start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        if (!sortCards.isEmpty()) {
+                            cardMover.changeCenterCardsPosition(sortCards, true, true);
                         }
-                    });
+
+                        moveSortedCards();
+                    }
+                });
     }
 
     private void moveCardsToSort() {
@@ -129,6 +130,7 @@ public abstract class MoveCardsButtonListener extends ClickListener {
     }
 
     private Tween initTween(final Card card) {
+        this.cardMover.showOnFogLayer(card);
         card.toFront();
         Point destination = new Point();
         this.cardMover.changeCenterCardsPosition(sortCards, true, true);

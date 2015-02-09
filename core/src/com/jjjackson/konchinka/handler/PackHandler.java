@@ -98,7 +98,7 @@ public class PackHandler extends GameObjectHandler {
                 this.showPackPosition.x = 225;
                 this.showPackPosition.y = 225;
                 this.hidePackPosition.x = 225;
-                this.hidePackPosition.y = -100;
+                this.hidePackPosition.y = -120;
                 break;
         }
     }

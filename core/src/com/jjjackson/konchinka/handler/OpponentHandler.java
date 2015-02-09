@@ -180,6 +180,7 @@ public class OpponentHandler extends GameObjectHandler {
     private void moveCardsToSort(final List<Card> sortedCards, List<Card> turnCombinedCards) {
         if (!turnCombinedCards.isEmpty()) {
             Card card = turnCombinedCards.remove(turnCombinedCards.size() - 1);
+            this.cardMover.showOnFogLayer(card);
             Tween tween = initTween(card, sortedCards);
             this.buffer.add(card);
             tween.start(this.tweenManager);
@@ -211,6 +212,7 @@ public class OpponentHandler extends GameObjectHandler {
     }
 
     private void takeTrick(final Card trick, CardPosition cardPosition, final List<Card> sortedCards) {
+        this.cardMover.showOnCardsLayer(trick);
         trick.toFront();
         Point destination = PositionCalculator.calcTrick(cardPosition, this.model.opponents.size());
         Tween.to(trick, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
@@ -257,6 +259,7 @@ public class OpponentHandler extends GameObjectHandler {
     }
 
     private Tween initBackTween(Card card, final List<Card> sortedCards) {
+        this.cardMover.showOnCardsLayer(card);
         card.toFront();
         Point destination = PositionCalculator.calcBoard(this.model.currentPlayer.cardPosition, this.model.opponents.size());
         int degree = PositionCalculator.calcRotation(this.model.currentPlayer.cardPosition);

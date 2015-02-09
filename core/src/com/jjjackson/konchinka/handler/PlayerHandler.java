@@ -4,7 +4,10 @@ import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
-import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.domain.Card;
+import com.jjjackson.konchinka.domain.GameModel;
+import com.jjjackson.konchinka.domain.GameObject;
+import com.jjjackson.konchinka.domain.User;
 import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.listener.EndButtonListener;
 import com.jjjackson.konchinka.listener.SortButtonListener;
@@ -34,7 +37,6 @@ public class PlayerHandler extends GameObjectHandler {
                 model.buttons.trickButton.addListener(new TrickButtonListener(this.model, this.tweenManager,
                         this.cardMover, this.model.buttons.trickButton));
                 model.buttons.endButton.addListener(new EndButtonListener(this.model, this.tweenManager, this.combinedCards));
-
                 this.model.states.turn = TurnState.INIT_PLAY_CARDS;
                 break;
             case INIT_PLAY_CARDS:
@@ -70,6 +72,7 @@ public class PlayerHandler extends GameObjectHandler {
 
                         if (!canCombine(card)) {
                             moveCardToTable(card);
+                            model.states.turn = TurnState.INIT_PLAY_CARDS;
                             return;
                         }
 

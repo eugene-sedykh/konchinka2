@@ -57,6 +57,7 @@ public class TrickButtonListener extends MoveCardsButtonListener {
     }
 
     private void initMovement(final Card card) {
+        this.cardMover.showOnCardsLayer(card);
         card.toFront();
         Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.TRICK_BOTTOM_X, GameConstants.TRICK_BOTTOM_Y, 0).

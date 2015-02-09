@@ -19,6 +19,7 @@ public class KonchinkaGame extends Game {
 
     @Override
     public void dispose() {
+        this.gameScreen.dispose();
         Gdx.app.exit();
     }
 }

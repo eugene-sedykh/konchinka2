@@ -1,28 +1,43 @@
 package com.jjjackson.konchinka.domain;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.util.PositionCalculator;
 
 
 public class UserAvatar extends GameObject {
 
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private static final String STROKE_SUFFIX = "_stroke";
+
     private int avatarX;
     private int avatarY;
-    private int width = GameConstants.CARD_WIDTH;
-    private int height = GameConstants.CARD_HEIGHT;
-    private float alpha = 0.0f;
 
-    public UserAvatar(CardPosition cardPosition, int opponentsNumber) {
+    public int getAvatarX() {
+        return avatarX;
+    }
+
+    public int getAvatarY() {
+        return avatarY;
+    }
+
+    private TextureRegion avatar;
+    private TextureRegion avatarStroke;
+    private boolean isUserActive;
+
+    public UserAvatar(Skin skin, String name) {
+        this.avatar = skin.getRegion(name);
+        this.avatarStroke = skin.getRegion(name + STROKE_SUFFIX);
+    }
+
+    public void initPosition(CardPosition cardPosition, int opponentsNumber) {
         Point point = PositionCalculator.calcTrick(cardPosition, opponentsNumber);
-        setX(point.x);
-        setY(point.y);
+        this.avatarX = point.x + ((GameConstants.CARD_WIDTH - this.avatar.getRegionWidth()) / 2);
+        this.avatarY = point.y + ((GameConstants.CARD_HEIGHT - this.avatar.getRegionHeight()) / 2);
+        setX(this.avatarX);
+        setY(this.avatarY);
     }
 
     @Override
@@ -32,27 +47,17 @@ public class UserAvatar extends GameObject {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.end();
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        this.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        this.shapeRenderer.setColor(Color.GREEN.r, Color.GREEN.g, Color.GREEN.b, this.alpha);
-        this.shapeRenderer.rect(this.getX(), this.getY(), this.width, this.height);
-        this.shapeRenderer.end();
-        this.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        this.shapeRenderer.setColor(Color.RED.r, Color.RED.g, Color.RED.b, 1);
-        this.shapeRenderer.rect(this.getX() + 1, this.getY(), this.width - 2, this.height);
-        this.shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-        batch.begin();
+        batch.draw(this.avatar, getX(), getY());
+        if (this.isUserActive) {
+            batch.draw(this.avatarStroke, getX(), getY());
+        }
     }
 
     public void activate() {
-        this.alpha = 0.4f;
-        toFront();
+        this.isUserActive = true;
     }
 
     public void deactivate() {
-        this.alpha = 0.0f;
+        this.isUserActive = false;
     }
 }

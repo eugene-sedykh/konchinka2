@@ -1,18 +1,25 @@
 package com.jjjackson.konchinka.handler;
 
-import aurelienribon.tweenengine.*;
-import com.badlogic.gdx.Gdx;
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Timeline;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.domain.state.GameState;
+import com.jjjackson.konchinka.domain.state.ResultState;
+import com.jjjackson.konchinka.util.ActorHelper;
 import com.jjjackson.konchinka.util.PositionCalculator;
 import com.jjjackson.konchinka.util.ResultCalculator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResultHandler extends GameObjectHandler {
 
@@ -25,7 +32,18 @@ public class ResultHandler extends GameObjectHandler {
     @Override
     public void handle() {
         switch (this.model.states.result) {
-            case NONE:
+            case INIT:
+                this.model.buttons.newGameButton.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        model.states.game = GameState.NEW_GAME;
+                        model.states.result = ResultState.CALCULATE;
+                    }
+                });
+                this.model.buttons.mainMenuButton.addListener(new ClickListener());
+                model.states.result = ResultState.CALCULATE;
+                break;
+            case CALCULATE:
                 List<User> users = new ArrayList<>();
                 users.add(this.model.player);
                 users.addAll(this.model.opponents);
@@ -43,18 +61,8 @@ public class ResultHandler extends GameObjectHandler {
     }
 
     private void hideBottomLayer() {
-        Group bottomLayer = getLayerByName(this.model.stage, GameConstants.BOTTOM_LAYER_NAME);
+        Group bottomLayer = ActorHelper.getLayerByName(this.model.stage.getActors(), GameConstants.BOTTOM_LAYER_NAME);
         bottomLayer.setVisible(false);
-    }
-
-    private Group getLayerByName(Stage stage, String layerName) {
-        for (Actor actor : stage.getActors()) {
-            if (actor.getName().equals(layerName)) {
-                return (Group) actor;
-            }
-        }
-
-        return null;
     }
 
     private void moveAvatarsToCenter() {
@@ -72,18 +80,32 @@ public class ResultHandler extends GameObjectHandler {
                         List<User> users = new ArrayList<>(model.opponents);
                         users.add(model.player);
 
-                        Group topLayer = getLayerByName(model.stage, GameConstants.TOP_LAYER_NAME);
-                        Group resultLayer = getLayerByName(topLayer, GameConstants.RESULT_LAYER_NAME);
+                        Group resultLayer = ActorHelper.getLayerByName(model.stage.getActors(), GameConstants.RESULT_LAYER_NAME);
 
-                        renderResultLabels((model.player.avatar.getY() - model.player.avatar.getHeight()), topLayer);
+                        renderResultLabels((model.player.avatar.getY() - model.player.avatar.getHeight()), resultLayer);
                         for (User user : users) {
                             renderResults(user, resultLayer);
                         }
+
+                        resultLayer.addActor(createResultLine());
+                        resultLayer.addActor(model.buttons.mainMenuButton);
+                        resultLayer.addActor(model.buttons.newGameButton);
 
                     }
                 })
                 .start(this.tweenManager);
 
+    }
+
+    private ResultLine createResultLine() {
+        List<UserAvatar> avatars = getAvatars();
+
+        ResultLine resultLine = new ResultLine();
+        Point startPoint = new Point();
+        startPoint.x = (int) avatars.get(0).getX();
+        startPoint.y = GameConstants.RESULT_LINE_Y;
+        resultLine.setStartPoint(startPoint);
+        return resultLine;
     }
 
     private void renderResultLabels(float y0, Group topLayer) {
@@ -116,13 +138,9 @@ public class ResultHandler extends GameObjectHandler {
         return image;
     }
 
-    private Group getLayerByName(Group group, String layerName) {
-        return group.findActor(layerName);
-    }
-
     private void renderResults(User user, Group topLayer) {
         float labelX = user.avatar.getX() + GameConstants.RESULT_LABEL_X_SHIFT;
-        float labelY = user.avatar.getY()- GameConstants.RESULT_LABEL_Y_SHIFT;
+        float labelY = user.avatar.getY() - GameConstants.RESULT_LABEL_Y_SHIFT - GameConstants.RESULT_FONT_Y_SHIFT;
 
         topLayer.addActor(createLabel(user.gameResult.ace, labelX, labelY));
 
@@ -141,7 +159,7 @@ public class ResultHandler extends GameObjectHandler {
         labelY -= GameConstants.RESULT_LABEL_Y_SHIFT;
         topLayer.addActor(createLabel(user.gameResult.tricks, labelX, labelY));
 
-        labelY -= GameConstants.RESULT_LABEL_Y_SHIFT * 2;
+        labelY -= GameConstants.RESULT_LABEL_Y_SHIFT * 1.5;
         topLayer.addActor(createLabel(user.gameResult.total, labelX, labelY));
     }
 
@@ -149,24 +167,7 @@ public class ResultHandler extends GameObjectHandler {
         Label label = new Label(String.valueOf(value), model.skin);
         label.setX(x - 25);
         label.setY(y + 20);
-        label.setFontScale(3f);
         return label;
     }
 
-    private List<UserAvatar> getAvatars() {
-        List<UserAvatar> avatars = new ArrayList<>();
-
-        avatars.add(this.model.player.avatar);
-        for (User opponent : this.model.opponents) {
-            avatars.add(opponent.avatar);
-        }
-
-        return avatars;
-    }
-
-    private Tween createAvatarTween(UserAvatar avatar, Point destination) {
-        return Tween.to(avatar, GameObject.POSITION_XY, GameConstants.AVATAR_SPEED).
-                target(destination.x, destination.y).
-                start(this.tweenManager);
-    }
 }

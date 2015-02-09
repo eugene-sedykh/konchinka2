@@ -1,11 +1,20 @@
 package com.jjjackson.konchinka.util;
 
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.Card;
 
 import java.util.List;
 
 public class CardMover {
+    private final Group fogLayer;
+    private final Group cardsLayer;
+
+    public CardMover(Stage stage) {
+        this.fogLayer = ActorHelper.getLayerByName(stage.getActors(), GameConstants.TOP_LAYER_NAME);
+        this.cardsLayer = ActorHelper.getLayerByName(stage.getActors(), GameConstants.BOTTOM_LAYER_NAME);
+    }
 
     public void changeCenterCardsPosition(List<Card> cards, boolean addPlaceholder) {
         changeCenterCardsPosition(cards, addPlaceholder, false);
@@ -40,5 +49,15 @@ public class CardMover {
         }
 
         return totalInRow + (addPlaceholder ? 1 : 0);
+    }
+
+    public void showOnCardsLayer(Card card) {
+        this.fogLayer.removeActor(card);
+        this.cardsLayer.addActor(card);
+    }
+
+    public void showOnFogLayer(Card card) {
+        this.cardsLayer.removeActor(card);
+        this.fogLayer.addActor(card);
     }
 }

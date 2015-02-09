@@ -71,15 +71,18 @@ public class GameConstants {
     public static final String TOP_LAYER_NAME = "top";
     public static final String RESULT_LAYER_NAME = "result";
 
-    public static final int AVATARS_CENTER_Y = 600;
+    public static final int AVATARS_CENTER_Y = 700;
     public static final int AVATAR_WIDTH = 96;
     public static final int AVATAR_HEIGHT = 96;
     public static final float AVATAR_SPEED = 1;
     public static final int AVATAR_X0 = 100;
 
-    public static final float RESULT_LABEL_X_SHIFT = 50;
+    public static final float RESULT_LABEL_X_SHIFT = 37;
     public static final float RESULT_LABEL_Y_SHIFT = 70;
     public static final float RESULT_IMAGE_X = 30;
 
+    public static final float RESULT_FONT_Y_SHIFT = 45;
+
     public static final int SHIFT_Y = 85;
+    public static final int RESULT_LINE_Y = 260;
 }
