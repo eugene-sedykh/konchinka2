@@ -88,14 +88,7 @@ public class PlayerHandler extends GameObjectHandler {
                                 public void onEvent(int type, BaseTween<?> source) {
                                     model.table.playCards.add(card);
                                     if (PlayerUtil.wasLastTurn(model)) {
-                                        ActorHelper.takeTableCards(model, tweenManager, new TweenCallback() {
-                                            @Override
-                                            public void onEvent(int type, BaseTween<?> source) {
-                                                ((User)(model.currentPlayer)).boardCards.addAll(model.table.playCards);
-                                                model.table.playCards.clear();
-                                                setNextState();
-                                            }
-                                        });
+                                        takeTrickAndRemainingCards(model.table.playCards.remove(0));
                                     } else {
                                         setNextState();
                                     }
@@ -117,6 +110,31 @@ public class PlayerHandler extends GameObjectHandler {
                         playCardValue = card.value;
                     }
                 });
+    }
+
+    private void takeTrickAndRemainingCards(final Card trick) {
+        Tween.to(trick, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
+                target(GameConstants.TRICK_BOTTOM_X, GameConstants.TRICK_BOTTOM_Y).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        trick.showBack();
+                        if (model.table.playCards.isEmpty()) {
+                            setNextState();
+                        } else {
+                            ActorHelper.takeTableCards(model, tweenManager, new TweenCallback() {
+                                @Override
+                                public void onEvent(int type, BaseTween<?> source) {
+                                    ((User) (model.currentPlayer)).boardCards.addAll(model.table.playCards);
+                                    model.table.playCards.clear();
+                                    setNextState();
+                                }
+                            });
+                        }
+                    }
+                }).start(this.tweenManager);
+        this.model.states.turn = TurnState.WAIT;
     }
 
     private void setNextState() {

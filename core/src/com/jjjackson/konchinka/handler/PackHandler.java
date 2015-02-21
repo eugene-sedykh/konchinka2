@@ -53,6 +53,7 @@ public class PackHandler extends GameObjectHandler {
         this.pack.initPositions(this.model.dealerPosition);
         this.pack.hideOnDealerSide();
         this.pack.refreshTexture();
+        this.pack.toFront();
 
         Tween.to(this.pack, GameObject.POSITION_XY, GameConstants.PACK_SPEED).
                 target(this.pack.getShowPosition().x, this.pack.getShowPosition().y).
@@ -68,6 +69,7 @@ public class PackHandler extends GameObjectHandler {
     }
 
     private void movePackOut() {
+        this.pack.toFront();
         Tween.to(this.pack, GameObject.POSITION_XY, GameConstants.PACK_SPEED).
                 target(this.pack.getHidePosition().x, this.pack.getHidePosition().y).
                 start(this.tweenManager).

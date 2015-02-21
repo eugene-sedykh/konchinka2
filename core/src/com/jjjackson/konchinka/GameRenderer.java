@@ -41,7 +41,7 @@ public class GameRenderer {
         this.stage.addActor(firstGroup);
         this.stage.addActor(secondGroup);
 
-        secondGroup.addActor(this.model.pack);
+        firstGroup.addActor(this.model.pack);
 
         for (Card card : this.model.pack.cards) {
             firstGroup.addActor(card);
