@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.GameState;
@@ -18,7 +19,6 @@ import com.jjjackson.konchinka.util.ActorHelper;
 import com.jjjackson.konchinka.util.PositionCalculator;
 import com.jjjackson.konchinka.util.ResultCalculator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ResultHandler extends GameObjectHandler {
@@ -44,7 +44,7 @@ public class ResultHandler extends GameObjectHandler {
                 model.states.result = ResultState.CALCULATE;
                 break;
             case CALCULATE:
-                List<User> users = new ArrayList<>();
+                Array<User> users = new Array<>();
                 users.add(this.model.player);
                 users.addAll(this.model.opponents);
                 this.resultCalculator.calculate(users);
@@ -77,7 +77,7 @@ public class ResultHandler extends GameObjectHandler {
                 .setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int i, BaseTween<?> baseTween) {
-                        List<User> users = new ArrayList<>(model.opponents);
+                        Array<User> users = new Array(model.opponents);
                         users.add(model.player);
 
                         Group resultLayer = ActorHelper.getLayerByName(model.stage.getActors(), GameConstants.RESULT_LAYER_NAME);

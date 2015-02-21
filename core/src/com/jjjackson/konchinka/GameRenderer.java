@@ -28,7 +28,6 @@ public class GameRenderer {
         this.skin = skin;
         this.model.font = new BitmapFont(Gdx.files.internal("font/default.fnt"), Gdx.files.internal("font/default.png"), false);
 //        this.model.font = new BitmapFont(Gdx.files.internal("font/torhok.fnt"), Gdx.files.internal("font/torhok.png"), false);
-        Gdx.app.log("PlayerHandler state", model.states.turn.toString());
         this.stage.getBatch().enableBlending();
 
         Group firstGroup = new Group();
@@ -42,7 +41,7 @@ public class GameRenderer {
         this.stage.addActor(firstGroup);
         this.stage.addActor(secondGroup);
 
-        firstGroup.addActor(this.model.pack);
+        secondGroup.addActor(this.model.pack);
 
         for (Card card : this.model.pack.cards) {
             firstGroup.addActor(card);

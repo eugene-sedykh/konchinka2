@@ -16,15 +16,14 @@ import java.util.Random;
 
 public class PackHandler extends GameObjectHandler {
 
-    private boolean isCardMoving;
-    private boolean isMovementInit;
     private float jackX;
     private float jackY;
-    private Point showPackPosition = new Point();
-    private Point hidePackPosition = new Point();
+
+    private Pack pack;
 
     public PackHandler(GameModel model, TweenManager tweenManager) {
         super(model, tweenManager);
+        this.pack = model.pack;
     }
 
     @Override
@@ -37,139 +36,90 @@ public class PackHandler extends GameObjectHandler {
                 movePackOut();
                 break;
             case DEAL:
-                dealCards();
+                dealCard();
                 break;
             case JACK_IN:
-                moveJackIn();
+                moveJackToPack();
                 break;
             case JACK_OUT:
-                moveJackOut();
+                moveJackReplacementToTable();
+                break;
+            case WAIT:
                 break;
         }
     }
 
     private void movePackIn() {
-        if (!isCardMoving) {
-            initPackPositions(this.model.dealerPosition);
-            this.isCardMoving = true;
-        } else if (!this.isMovementInit) {
-            this.model.pack.setX(this.hidePackPosition.x);
-            this.model.pack.setY(this.hidePackPosition.y);
+        this.pack.initPositions(this.model.dealerPosition);
+        this.pack.hideOnDealerSide();
+        this.pack.refreshTexture();
 
-            Tween.to(this.model.pack, GameObject.POSITION_XY, 0.4f).
-                    target(this.showPackPosition.x, showPackPosition.y).
-                    start(this.tweenManager).
-                    setCallback(new TweenCallback() {
-                        @Override
-                        public void onEvent(int type, BaseTween<?> source) {
-                            if (type != COMPLETE) return;
-
-                            model.states.deal = DealState.DEAL;
-                            isCardMoving = false;
-                            isMovementInit = false;
-                        }
-                    });
-            isMovementInit = true;
-        }
-
-    }
-
-    private void initPackPositions(CardPosition dealerPosition) {
-        switch (dealerPosition) {
-            case LEFT:
-                this.showPackPosition.x = 150;
-                this.showPackPosition.y = 350;
-                this.hidePackPosition.x = -100;
-                this.hidePackPosition.y = 350;
-                break;
-            case TOP:
-                this.showPackPosition.x = 225;
-                this.showPackPosition.y = 650;
-                this.hidePackPosition.x = 225;
-                this.hidePackPosition.y = 900;
-                break;
-            case RIGHT:
-                this.showPackPosition.x = 330;
-                this.showPackPosition.y = 350;
-                this.hidePackPosition.x = 490;
-                this.hidePackPosition.y = 350;
-                break;
-            case BOTTOM:
-                this.showPackPosition.x = 225;
-                this.showPackPosition.y = 225;
-                this.hidePackPosition.x = 225;
-                this.hidePackPosition.y = -120;
-                break;
-        }
-    }
-
-    private void movePackOut() {
-        Tween.to(this.model.pack, GameObject.POSITION_XY, 0.4f).
-                target(this.hidePackPosition.x, this.hidePackPosition.y).
-                start(this.tweenManager).
+        Tween.to(this.pack, GameObject.POSITION_XY, GameConstants.PACK_SPEED).
+                target(this.pack.getShowPosition().x, this.pack.getShowPosition().y).
+                setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
-                        if (type != COMPLETE) return;
+                        model.states.deal = DealState.DEAL;
+                    }
+                }).
+                start(this.tweenManager);
+        this.model.states.deal = DealState.WAIT;
+    }
 
-                        model.states.deal = DealState.NONE;
+    private void movePackOut() {
+        Tween.to(this.pack, GameObject.POSITION_XY, GameConstants.PACK_SPEED).
+                target(this.pack.getHidePosition().x, this.pack.getHidePosition().y).
+                start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        model.states.deal = DealState.PACK_IN;
                         model.states.game = GameState.TURN;
-                        model.cardHolders.remove(model.table);
+                        model.cardHolders.removeValue(model.table, true);
                     }
                 });
     }
 
-    private void dealCards() {
-        if (!this.isCardMoving) {
-            if (isCardsDealt()) {
-                if (isJackOnTable() && this.model.turnCount == 1) {
-                    this.model.states.deal = DealState.JACK_IN;
-                    return;
-                }
-                this.model.states.deal = DealState.PACK_OUT;
-                return;
-            }
-            this.movingCard = this.model.pack.cards.remove(0);
-            this.model.pack.refreshTexture();
-            initStartPosition(this.movingCard, (int) (this.model.pack.getX() + this.model.pack.getWidth() - GameConstants.CARD_WIDTH),
-                    (int) (this.model.pack.getY() + this.model.pack.getHeight() - GameConstants.CARD_HEIGHT));
-            initEndPosition(this.movingCard);
+    private void dealCard() {
+        this.model.states.deal = DealState.WAIT;
+        final Card card = this.pack.cards.remove(0);
+        this.pack.refreshTexture();
+        initStartPosition(card, this.pack.getTopCardX(), this.pack.getTopCardY());
+        Point destination = calculateDestination(this.model.currentPlayer);
+        card.toFront();
 
-            this.isCardMoving = true;
-        } else if (!this.isMovementInit) {
-            this.movingCard.toFront();
-            Tween.to(this.movingCard, GameObject.POSITION_XY, GameConstants.DEALING_SPEED).
-                    target(this.movingCard.endX, this.movingCard.endY).
-                    start(this.tweenManager).
-                    setCallback(new TweenCallback() {
-                        @Override
-                        public void onEvent(int type, BaseTween<?> source) {
-                            if (type != COMPLETE) return;
-
-                            isCardMoving = false;
-                            isMovementInit = false;
-                            CardHolder cardHolder = getCurrentPlayer();
-                            cardHolder.playCards.add(movingCard);
-                            if (cardHolder == model.player || cardHolder instanceof Table) {
-                                movingCard.showFace();
-                            }
-                            PlayerUtil.switchPlayer(model);
+        Tween.to(card, GameObject.POSITION_XY, GameConstants.DEALING_SPEED).
+                target(destination.x, destination.y).
+                start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        CardHolder cardHolder = model.currentPlayer;
+                        cardHolder.playCards.add(card);
+                        if (cardHolder == model.player || cardHolder instanceof Table) {
+                            card.showFace();
                         }
-                    });
-            this.isMovementInit = true;
-        }
+                        PlayerUtil.switchPlayer(model);
+
+                        if (isCardsDealt()) {
+                            if (isJackOnTable() && model.turnCount == 1) {
+                                model.states.deal = DealState.JACK_IN;
+                                return;
+                            }
+                            model.states.deal = DealState.PACK_OUT;
+                        } else {
+                            dealCard();
+                        }
+                    }
+                });
     }
 
     private void initStartPosition(Card card, int x, int y) {
         card.setX(x);
         card.setY(y);
-    }
-
-    private void initEndPosition(Card card) {
-        CardHolder cardHolder = getCurrentPlayer();
-        Point point = calculateDestination(cardHolder);
-        card.endX = point.x;
-        card.endY = point.y;
     }
 
     private Point calculateDestination(CardHolder player) {
@@ -180,13 +130,13 @@ public class PackHandler extends GameObjectHandler {
                 PositionCalculator.calcBottom(cardNumber, destination);
                 break;
             case LEFT:
-                PositionCalculator.calcLeft(cardNumber, destination, this.model.opponents.size());
+                PositionCalculator.calcLeft(cardNumber, destination, this.model.opponents.size);
                 break;
             case TOP:
                 PositionCalculator.calcTop(cardNumber, destination);
                 break;
             case RIGHT:
-                PositionCalculator.calcRight(cardNumber, destination, this.model.opponents.size());
+                PositionCalculator.calcRight(cardNumber, destination, this.model.opponents.size);
                 break;
             case CENTER:
                 this.cardMover.changeCenterCardsPosition(player.playCards, true);
@@ -207,69 +157,59 @@ public class PackHandler extends GameObjectHandler {
 
     private boolean isCardsDealt() {
         for (CardHolder cardHolder : this.model.cardHolders) {
-            if (cardHolder.playCards.size() != 4) {
+            if (cardHolder.playCards.size() != GameConstants.PLAY_CARDS_NUMBER) {
                 return false;
             }
         }
         return true;
     }
 
-    private void moveJackOut() {
-        if (!this.isCardMoving) {
-            this.movingCard = this.model.pack.cards.remove(0);
-            initStartPosition(this.movingCard, (int) this.model.pack.getX(), (int) this.model.pack.getY());
-            initJackEndPosition(this.movingCard, this.jackX, this.jackY);
-            this.movingCard.showFace();
-            this.isCardMoving = true;
-        } else if (!this.isMovementInit) {
-            Tween.to(this.movingCard, GameObject.POSITION_XY, 0.2f).
-                    target(this.movingCard.endX, this.movingCard.endY).
-                    start(this.tweenManager).
-                    setCallback(new TweenCallback() {
-                        @Override
-                        public void onEvent(int type, BaseTween<?> source) {
-                            if (type != COMPLETE) return;
+    private void moveJackReplacementToTable() {
+        final Card card = this.pack.cards.remove(0);
+        initStartPosition(card, this.pack.getTopCardX(), this.pack.getTopCardY());
+        card.showFace();
 
-                            model.states.deal = DealState.DEAL;
-                            isCardMoving = false;
-                            isMovementInit = false;
-                            model.table.playCards.add(movingCard);
+        Tween.to(card, GameObject.POSITION_XY, 0.2f).
+                target(this.jackX, this.jackY).
+                start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        model.table.playCards.add(card);
+
+                        if (isJackOnTable() && model.turnCount == 1) {
+                            model.states.deal = DealState.JACK_IN;
+                            return;
                         }
-                    });
-            this.isMovementInit = true;
-        }
+
+                        model.states.deal = DealState.PACK_OUT;
+                    }
+                });
+        this.model.states.deal = DealState.WAIT;
     }
 
-    private void moveJackIn() {
-        if (!this.isCardMoving) {
-            Card jack = getJack(this.model.table.playCards);
-            this.jackX = jack.getX();
-            this.jackY = jack.getY();
-            this.movingCard = jack;
-            initJackEndPosition(jack, this.model.pack.getX(), this.model.pack.getY());
-            this.isCardMoving = true;
-        } else if (!this.isMovementInit) {
-            Tween.to(this.movingCard, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
-                    target(this.movingCard.endX, this.movingCard.endY).
-                    start(this.tweenManager).
-                    setCallback(new TweenCallback() {
-                        @Override
-                        public void onEvent(int type, BaseTween<?> source) {
-                            if (type != COMPLETE) return;
+    private void moveJackToPack() {
+        final Card jack = getJack(this.model.table.playCards);
+        this.jackX = jack.getX();
+        this.jackY = jack.getY();
 
-                            model.states.deal = DealState.JACK_OUT;
-                            isCardMoving = false;
-                            isMovementInit = false;
-                            model.pack.cards.add(getRandomPosition(10, 30), movingCard);
-                            model.table.playCards.remove(movingCard);
-                            movingCard.setX(-100);
-                            movingCard.setY(-100);
-                            movingCard.showBack();
-                        }
-                    });
-            this.isMovementInit = true;
-        }
-
+        Tween.to(jack, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
+                target(this.pack.getTopCardX(), this.pack.getTopCardY()).
+                start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        model.states.deal = DealState.JACK_OUT;
+                        pack.cards.add(getRandomPosition(10, 30), jack);
+                        model.table.playCards.remove(jack);
+                        jack.setX(-100);
+                        jack.setY(-100);
+                        jack.showBack();
+                    }
+                });
+        this.model.states.deal = DealState.WAIT;
     }
 
     private int getRandomPosition(int from, int to) {
@@ -283,10 +223,5 @@ public class PackHandler extends GameObjectHandler {
             }
         }
         return null;
-    }
-
-    private void initJackEndPosition(Card jack, float x, float y) {
-        jack.endX = (int) x;
-        jack.endY = (int) y;
     }
 }

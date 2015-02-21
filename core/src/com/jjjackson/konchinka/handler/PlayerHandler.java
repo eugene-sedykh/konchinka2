@@ -1,6 +1,7 @@
 package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.*;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
@@ -8,10 +9,12 @@ import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.domain.GameObject;
 import com.jjjackson.konchinka.domain.User;
+import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.listener.EndButtonListener;
 import com.jjjackson.konchinka.listener.SortButtonListener;
 import com.jjjackson.konchinka.listener.TrickButtonListener;
+import com.jjjackson.konchinka.util.ActorHelper;
 import com.jjjackson.konchinka.util.PlayerUtil;
 
 import java.util.ArrayList;
@@ -37,24 +40,34 @@ public class PlayerHandler extends GameObjectHandler {
                 model.buttons.trickButton.addListener(new TrickButtonListener(this.model, this.tweenManager,
                         this.cardMover, this.model.buttons.trickButton));
                 model.buttons.endButton.addListener(new EndButtonListener(this.model, this.tweenManager, this.combinedCards));
-                this.model.states.turn = TurnState.INIT_PLAY_CARDS;
+                this.model.states.turn = TurnState.INIT_PLAY_CARDS_LISTENERS;
+                Gdx.app.log(PlayerHandler.class.getSimpleName(), model.states.turn.toString());
                 break;
-            case INIT_PLAY_CARDS:
-                this.combinedCards.clear();
+            case INIT_PLAY_CARDS_LISTENERS:
                 addPlayCardListeners(this.model.player.playCards);
+                this.model.states.turn = TurnState.ENABLE_CARDS_AND_PLAYER;
+                Gdx.app.log(PlayerHandler.class.getSimpleName(), model.states.turn.toString());
+                break;
+            case ENABLE_CARDS_AND_PLAYER:
+                this.combinedCards.clear();
+                ActorHelper.enable(this.model.player.playCards);
                 PlayerUtil.enablePlayer(this.model.currentPlayer);
                 this.model.states.turn = TurnState.WAIT;
+                Gdx.app.log(PlayerHandler.class.getSimpleName(), model.states.turn.toString());
                 break;
         }
     }
 
     private void addPlayCardListeners(final List<Card> playCards) {
-        for (Card playCard : playCards) {
+        for (final Card playCard : playCards) {
             playCard.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    initCardMovement((Card)event.getTarget());
-                    removeListeners(playCards);
+                    Card card = (Card) event.getTarget();
+                    playCards.remove(card);
+                    removeListeners(Collections.singletonList(card));
+                    initCardMovement(card);
+                    ActorHelper.disable(playCards);
                 }
             });
         }
@@ -65,19 +78,34 @@ public class PlayerHandler extends GameObjectHandler {
         Tween.to(card, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.PLAY_CARD_X, GameConstants.PLAY_CARD_Y).
                 start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
-                        if (type != COMPLETE) return;
-
                         if (!canCombine(card)) {
-                            moveCardToTable(card);
-                            model.states.turn = TurnState.INIT_PLAY_CARDS;
+                            moveCardToTable(card, new TweenCallback() {
+                                @Override
+                                public void onEvent(int type, BaseTween<?> source) {
+                                    model.table.playCards.add(card);
+                                    if (PlayerUtil.wasLastTurn(model)) {
+                                        ActorHelper.takeTableCards(model, tweenManager, new TweenCallback() {
+                                            @Override
+                                            public void onEvent(int type, BaseTween<?> source) {
+                                                ((User)(model.currentPlayer)).boardCards.addAll(model.table.playCards);
+                                                model.table.playCards.clear();
+                                                setNextState();
+                                            }
+                                        });
+                                    } else {
+                                        setNextState();
+                                    }
+                                }
+                            });
                             return;
                         }
 
                         addSingleClickListener(getTouchableCards());
-                        if (card.isJack() || isLastTurn()) {
+                        if (card.isJack() || PlayerUtil.wasLastTurn(model)) {
                             for (Card playCard : model.table.playCards) {
                                 playCard.getListeners().clear();
                             }
@@ -86,10 +114,15 @@ public class PlayerHandler extends GameObjectHandler {
                         addPlayCardListener(card);
 
                         model.playCard = card;
-                        model.player.playCards.remove(card);
                         playCardValue = card.value;
                     }
                 });
+    }
+
+    private void setNextState() {
+        model.states.game = GameState.NEXT_TURN;
+        model.states.turn = model.player.playCards.isEmpty() ? TurnState.INIT_PLAY_CARDS_LISTENERS :
+                TurnState.ENABLE_CARDS_AND_PLAYER;
     }
 
     private void addPlayCardListener(final Card card) {
@@ -100,10 +133,10 @@ public class PlayerHandler extends GameObjectHandler {
                 Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                         target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
                         start(tweenManager).
+                        setCallbackTriggers(TweenCallback.COMPLETE).
                         setCallback(new TweenCallback() {
                             @Override
                             public void onEvent(int type, BaseTween<?> source) {
-                                if (type != COMPLETE) return;
                                 model.turnCombinedCards.add(card);
                                 card.getListeners().clear();
                                 model.playCard = null;

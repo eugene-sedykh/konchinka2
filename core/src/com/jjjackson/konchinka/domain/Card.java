@@ -11,8 +11,6 @@ public class Card extends GameObject {
     public static final float MARK_OPACITY = 1f;
     public final CardSuit cardSuit;
     public int value;
-    public int endX;
-    public int endY;
     public String face;
     private boolean isMarked;
 

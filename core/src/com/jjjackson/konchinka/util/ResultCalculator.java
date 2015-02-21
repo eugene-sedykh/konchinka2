@@ -1,5 +1,6 @@
 package com.jjjackson.konchinka.util;
 
+import com.badlogic.gdx.utils.Array;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.CardSuit;
@@ -13,28 +14,28 @@ public class ResultCalculator {
     private static final int CARD_VALUE_TWO = 2;
     private static final int CARD_VALUE_TEN = 10;
 
-    public void calculate(List<User> users) {
+    public void calculate(Array<User> users) {
         clearResults(users);
         calculateSpecialPoints(users);
         calculateClubsAndCards(users);
         calculateTotal(users);
     }
 
-    private void calculateTotal(List<User> users) {
+    private void calculateTotal(Array<User> users) {
         for (User user : users) {
             GameResult gameResult = user.gameResult;
-            gameResult.total = gameResult.ace + gameResult.clubsTwo + gameResult.diamondsTen + gameResult.clubs +
+            gameResult.total += gameResult.ace + gameResult.clubsTwo + gameResult.diamondsTen + gameResult.clubs +
                     gameResult.cards + gameResult.tricks;
         }
     }
 
-    private void clearResults(List<User> users) {
+    private void clearResults(Array<User> users) {
         for (User user : users) {
             user.gameResult.clear();
         }
     }
 
-    private void calculateSpecialPoints(List<User> users) {
+    private void calculateSpecialPoints(Array<User> users) {
         for (User user : users) {
             for (Card card : user.boardCards) {
                 calculateSpecialPoint(user.gameResult, card);
@@ -64,12 +65,12 @@ public class ResultCalculator {
         return card.value == CARD_VALUE_TEN && card.cardSuit == CardSuit.DIAMONDS;
     }
 
-    private void calculateClubsAndCards(List<User> users) {
+    private void calculateClubsAndCards(Array<User> users) {
         calculateClubs(users);
         calculateCards(users);
     }
 
-    private void calculateClubs(List<User> users) {
+    private void calculateClubs(Array<User> users) {
         Map<User, Integer> usersClubsNumber = calculateUsersClubs(users);
         int maxClubsNumber = max(usersClubsNumber.values());
 
@@ -103,7 +104,7 @@ public class ResultCalculator {
         return result;
     }
 
-    private Map<User, Integer> calculateUsersClubs(List<User> users) {
+    private Map<User, Integer> calculateUsersClubs(Array<User> users) {
         Map<User, Integer> result = new HashMap<>();
 
         for (User user : users) {
@@ -134,11 +135,7 @@ public class ResultCalculator {
         return result;
     }
 
-    private int getMaxClubsNumber(List<User> users) {
-        return 0;
-    }
-
-    private void calculateCards(List<User> users) {
+    private void calculateCards(Array<User> users) {
         int maxCardsNumber = getMaxCardsNumber(users);
         List<User> usersHavingMaxCards = getUsersHavingMaxCards(users, maxCardsNumber);
 
@@ -147,7 +144,7 @@ public class ResultCalculator {
         }
     }
 
-    private List<User> getUsersHavingMaxCards(List<User> users, int maxCardsNumber) {
+    private List<User> getUsersHavingMaxCards(Array<User> users, int maxCardsNumber) {
         List<User> maxCardsUsers = new ArrayList<>();
 
         for (User user : users) {
@@ -159,7 +156,7 @@ public class ResultCalculator {
         return maxCardsUsers;
     }
 
-    private int getMaxCardsNumber(List<User> users) {
+    private int getMaxCardsNumber(Array<User> users) {
         int max = 0;
 
         for (User user : users) {

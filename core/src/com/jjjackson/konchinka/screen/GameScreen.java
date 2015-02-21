@@ -5,11 +5,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.GameController;
 import com.jjjackson.konchinka.GameRenderer;
 import com.jjjackson.konchinka.KonchinkaGame;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.util.PlayerUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,39 +96,19 @@ public class GameScreen implements Screen {
                 model.opponents.add(new User(UserType.COMPUTER, CardPosition.TOP, 3, getCpuAvatar()));
                 model.opponents.add(new User(UserType.COMPUTER, CardPosition.RIGHT, 3, getCpuAvatar()));
         }
-        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM, model.opponents.size(), this.userAvatar);
+        model.player = new User(UserType.PLAYER, CardPosition.BOTTOM, model.opponents.size, this.userAvatar);
 
-        model.cardHolders = new ArrayList<>();
+        model.cardHolders = new Array<>();
         model.cardHolders.addAll(model.opponents);
         model.cardHolders.add(model.player);
 
-        sort(model.cardHolders, dealerPosition);
-
-        model.cardHolders.add(model.cardHolders.size() - 1, model.table);
-
-        model.cardHolders.get(0).isCurrent = true;
-        model.currentPlayer = model.cardHolders.get(0);
-
+        PlayerUtil.prepareCardHoldersForDealing(model, dealerPosition);
     }
 
     private UserAvatar getCpuAvatar() {
         Random random = new Random();
         int avatarIndex = random.nextInt(this.cpuAvatars.size());
         return this.cpuAvatars.remove(avatarIndex);
-    }
-
-    private void sort(List<CardHolder> cardHolders, CardPosition dealerPosition) {
-        int dealerIndex = getDealerIndex(cardHolders, dealerPosition);
-        Collections.rotate(cardHolders, cardHolders.size() - dealerIndex - 1);
-    }
-
-    private int getDealerIndex(List<CardHolder> cardHolders, CardPosition dealerPosition) {
-        for (int i = 0; i < cardHolders.size(); i++) {
-            if (cardHolders.get(i).cardPosition == dealerPosition) {
-                return i;
-            }
-        }
-        return 0;
     }
 
     @Override

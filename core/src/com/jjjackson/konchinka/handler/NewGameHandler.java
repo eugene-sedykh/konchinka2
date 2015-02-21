@@ -12,7 +12,6 @@ import com.jjjackson.konchinka.domain.state.NewGameState;
 import com.jjjackson.konchinka.util.ActorHelper;
 import com.jjjackson.konchinka.util.PlayerUtil;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +35,17 @@ public class NewGameHandler extends GameObjectHandler {
     private void prepare() {
         hideResultsLayer();
         moveAvatarsBack();
+        addTableToCardHolders();
+        reloadTurnCount();
+    }
+
+    private void reloadTurnCount() {
+        this.model.turnCount = 1;
+    }
+
+    private void addTableToCardHolders() {
+        model.dealerPosition = model.currentPlayer.cardPosition;
+        PlayerUtil.prepareCardHoldersForDealing(model, model.dealerPosition);
     }
 
     private void hideResultsLayer() {
@@ -53,7 +63,6 @@ public class NewGameHandler extends GameObjectHandler {
                     @Override
                     public void onEvent(int i, BaseTween<?> baseTween) {
                         preparePack();
-                        switchDealer();
                         showCardsLayer();
                         model.states.game = GameState.DEAL;
                         model.states.newGame = NewGameState.INIT;
@@ -62,23 +71,19 @@ public class NewGameHandler extends GameObjectHandler {
                 .start(this.tweenManager);
     }
 
-    private void switchDealer() {
-        this.model.dealerPosition = this.model.currentPlayer.cardPosition;
-        PlayerUtil.switchPlayer(this.model);
-    }
-
     private void preparePack() {
-        gatherCards();
-        moveCardsToPackAndShuffle();
+        gatherCardsAndShuffle();
+        moveCardsToPack();
+        this.model.pack.refreshTexture();
     }
 
-    private void moveCardsToPackAndShuffle() {
+    private void moveCardsToPack() {
         for (Card card : this.model.pack.cards) {
             card.setX(this.model.pack.getX());
             card.setY(this.model.pack.getY());
+            card.setRotation(0);
             card.showBack();
         }
-        Collections.shuffle(this.model.pack.cards);
     }
 
     private void showCardsLayer() {
@@ -86,23 +91,21 @@ public class NewGameHandler extends GameObjectHandler {
         bottomLayer.setVisible(true);
     }
 
-    private void gatherCards() {
-        List<Card> cards = this.model.pack.cards;
-
-        cards.addAll(getFromUser(model.player));
+    private void gatherCardsAndShuffle() {
+        getFromUser(this.model.pack.cards, model.player);
 
         for (User opponent : model.opponents) {
-            cards.addAll(getFromUser(opponent));
+            getFromUser(this.model.pack.cards, opponent);
         }
+
+        Collections.shuffle(this.model.pack.cards);
     }
 
-    private List<Card> getFromUser(User user) {
-        List<Card> cards = new ArrayList<>(user.boardCards);
+    private void getFromUser(List<Card> cards, User user) {
+        cards.addAll(user.boardCards);
         cards.addAll(user.tricks);
 
         user.boardCards.clear();
         user.tricks.clear();
-
-        return cards;
     }
 }

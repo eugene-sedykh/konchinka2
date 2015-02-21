@@ -1,13 +1,12 @@
 package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.TweenManager;
+import com.badlogic.gdx.utils.Array;
 import com.jjjackson.konchinka.domain.CardHolder;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.domain.state.DealState;
 import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.util.PlayerUtil;
-
-import java.util.List;
 
 public class NextTurnHandler extends GameObjectHandler {
 
@@ -17,12 +16,13 @@ public class NextTurnHandler extends GameObjectHandler {
 
     @Override
     public void handle() {
-        if (isLastTurn()) {
+        switchPlayer();
+
+        if (PlayerUtil.wasLastTurn(this.model)) {
             this.model.states.game = GameState.GAME_RESULT;
+            PlayerUtil.disablePlayer(this.model.currentPlayer);
             return;
         }
-
-        switchPlayer();
 
         if (needToDeal(this.model.cardHolders)) {
             this.model.states.game = GameState.DEAL;
@@ -39,7 +39,7 @@ public class NextTurnHandler extends GameObjectHandler {
         PlayerUtil.switchPlayer(this.model);
     }
 
-    private boolean needToDeal(List<CardHolder> cardHolders) {
+    private boolean needToDeal(Array<CardHolder> cardHolders) {
         for (CardHolder cardHolder : cardHolders) {
             if (!cardHolder.playCards.isEmpty()) {
                 return false;

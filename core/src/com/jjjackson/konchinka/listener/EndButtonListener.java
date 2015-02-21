@@ -1,6 +1,8 @@
 package com.jjjackson.konchinka.listener;
 
+import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -8,6 +10,8 @@ import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
 import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.domain.state.TurnState;
+import com.jjjackson.konchinka.util.ActorHelper;
+import com.jjjackson.konchinka.util.PlayerUtil;
 
 import java.util.List;
 
@@ -48,8 +52,24 @@ public class EndButtonListener extends ClickListener {
         this.model.buttons.sortButton.setVisible(false);
         this.model.buttons.endButton.setVisible(false);
 
+        if (PlayerUtil.wasLastTurn(this.model) && !this.model.table.playCards.isEmpty()) {
+            ActorHelper.takeTableCards(this.model, this.tweenManager, new TweenCallback() {
+                @Override
+                public void onEvent(int type, BaseTween<?> source) {
+                    ((User)(model.currentPlayer)).boardCards.addAll(model.table.playCards);
+                    model.table.playCards.clear();
+                    setNextState();
+                }
+            });
+        } else {
+            setNextState();
+        }
+    }
+
+    private void setNextState() {
+        this.model.states.turn = model.player.playCards.isEmpty() ? TurnState.INIT_PLAY_CARDS_LISTENERS :
+                TurnState.ENABLE_CARDS_AND_PLAYER;
         this.model.states.game = GameState.NEXT_TURN;
-        this.model.states.turn = TurnState.INIT_PLAY_CARDS;
     }
 
     private void removeAllListeners() {
@@ -59,7 +79,6 @@ public class EndButtonListener extends ClickListener {
             removeListeners(user.tricks);
         }
         removeListeners(this.model.table.playCards);
-        removeListeners(this.model.player.playCards);
     }
 
     private void removeListeners(List<Card> cards) {
