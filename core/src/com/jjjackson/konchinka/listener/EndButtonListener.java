@@ -13,6 +13,7 @@ import com.jjjackson.konchinka.domain.state.TurnState;
 import com.jjjackson.konchinka.util.ActorHelper;
 import com.jjjackson.konchinka.util.PlayerUtil;
 
+import java.util.Collections;
 import java.util.List;
 
 public class EndButtonListener extends ClickListener {
@@ -46,6 +47,7 @@ public class EndButtonListener extends ClickListener {
         removeAllListeners();
 
         if (this.model.playCard != null) {
+            removeListeners(Collections.singletonList(this.model.playCard));
             playCardToBoard();
         }
 
@@ -56,8 +58,6 @@ public class EndButtonListener extends ClickListener {
             ActorHelper.takeTableCards(this.model, this.tweenManager, new TweenCallback() {
                 @Override
                 public void onEvent(int type, BaseTween<?> source) {
-                    ((User)(model.currentPlayer)).boardCards.addAll(model.table.playCards);
-                    model.table.playCards.clear();
                     setNextState();
                 }
             });

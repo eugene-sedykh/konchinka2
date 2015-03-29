@@ -50,6 +50,7 @@ public class PlayerHandler extends GameObjectHandler {
                 break;
             case ENABLE_CARDS_AND_PLAYER:
                 this.combinedCards.clear();
+                this.model.turnCombinedCards.clear();
                 ActorHelper.enable(this.model.player.playCards);
                 PlayerUtil.enablePlayer(this.model.currentPlayer);
                 this.model.states.turn = TurnState.WAIT;
@@ -99,9 +100,7 @@ public class PlayerHandler extends GameObjectHandler {
 
                         addSingleClickListener(getTouchableCards());
                         if (card.isJack() || PlayerUtil.wasLastTurn(model)) {
-                            for (Card playCard : model.table.playCards) {
-                                playCard.getListeners().clear();
-                            }
+                            removeListeners(model.table.playCards);
                             addDoubleClickListener(model.table.playCards);
                         }
                         addPlayCardListener(card);
@@ -120,14 +119,15 @@ public class PlayerHandler extends GameObjectHandler {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
                         trick.showBack();
+                        ((User)model.currentPlayer).tricks.add(trick);
+                        model.table.playCards.remove(trick);
+
                         if (model.table.playCards.isEmpty()) {
                             setNextState();
                         } else {
                             ActorHelper.takeTableCards(model, tweenManager, new TweenCallback() {
                                 @Override
                                 public void onEvent(int type, BaseTween<?> source) {
-                                    ((User) (model.currentPlayer)).boardCards.addAll(model.table.playCards);
-                                    model.table.playCards.clear();
                                     setNextState();
                                 }
                             });
@@ -148,18 +148,12 @@ public class PlayerHandler extends GameObjectHandler {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 card.toFront();
+                removeListeners(Collections.singletonList(card));
+                model.turnCombinedCards.add(card);
+                model.playCard = null;
                 Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                         target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
-                        start(tweenManager).
-                        setCallbackTriggers(TweenCallback.COMPLETE).
-                        setCallback(new TweenCallback() {
-                            @Override
-                            public void onEvent(int type, BaseTween<?> source) {
-                                model.turnCombinedCards.add(card);
-                                card.getListeners().clear();
-                                model.playCard = null;
-                            }
-                        });
+                        start(tweenManager);
             }
         });
 
@@ -168,7 +162,6 @@ public class PlayerHandler extends GameObjectHandler {
     private void addDoubleClickListener(List<Card> cards) {
         for (final Card card : cards) {
             card.addListener(new ClickListener() {
-
                 private DoubleClickRunnable doubleClickRunnable;
 
                 @Override
@@ -212,7 +205,6 @@ public class PlayerHandler extends GameObjectHandler {
             } else if (this.playCardValue == newSum) {
                 mark(card);
                 takeCombinedCards();
-
             } else {
                 unmark(this.combinedCards);
             }
@@ -265,8 +257,9 @@ public class PlayerHandler extends GameObjectHandler {
     }
 
     private boolean shouldShowTrickButton() {
-        return this.model.turnCombinedCards.containsAll(this.model.table.playCards) &&
-                !this.model.table.playCards.isEmpty() && !this.model.isTrickTaken;
+        return (this.model.turnCombinedCards.containsAll(this.model.table.playCards) &&
+                !this.model.table.playCards.isEmpty() && !this.model.isTrickTaken) ||
+                (PlayerUtil.wasLastTurn(this.model) && !this.model.isTrickTaken);
     }
 
     private Tween initTween(Card card) {
@@ -375,11 +368,10 @@ public class PlayerHandler extends GameObjectHandler {
         Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
                 start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
-                        if (type != COMPLETE) return;
-
                         combinedCards.remove(card);
                         model.turnCombinedCards.add(card);
                         removeListeners(Collections.singletonList(card));

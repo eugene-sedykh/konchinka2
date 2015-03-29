@@ -81,15 +81,6 @@ public class CardCombinator {
         }
     }
 
-    public int getSum(List<Card> cards) {
-        int sum = 0;
-        for (Card card : cards) {
-            sum += card.value;
-        }
-
-        return sum;
-    }
-
     public boolean isCombinationPresent(List<Card> cards, int target) {
         Collections.sort(cards, new CardComparator());
         return populateCombinableCards(cards.toArray(new Card[cards.size()]), 0, new Card[cards.size()], 0, target);
@@ -185,7 +176,7 @@ public class CardCombinator {
         if (jack != null && isValuableCardPresent(table.playCards)) {
             Gdx.app.log("Jack", "true");
             CardCombination cardCombination = buildJackCombination(jack, cardCombinations);
-            if (cardCombination.combination == null) {
+            if (cardCombination.combination == null || cardCombination.combination.isEmpty()) {
                 cardCombination.combination = table.playCards;
             }
 

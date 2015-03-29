@@ -46,17 +46,40 @@ public class OpponentHandler extends GameObjectHandler {
         }
     }
 
+    private void choosePlayCard() {
+        List<Card> playCardHeap = getPlayCardHeap();
+        CardCombination bestCombination = this.cardCombinator.calculateAndChooseCombination(playCardHeap,
+                this.model.currentPlayer.playCards, this.model.table);
+        this.playCard = bestCombination.card;
+        this.combinedCards = bestCombination.combination;
+        this.model.currentPlayer.playCards.remove(bestCombination.card);
+    }
+
+    private List<Card> getPlayCardHeap() {
+        List<Card> cards = new ArrayList<>();
+
+        for (CardHolder cardHolder : this.model.cardHolders) {
+            if (cardHolder == this.model.currentPlayer) continue;
+
+            User user = (User) cardHolder;
+            if (user.boardCards.isEmpty()) continue;
+            cards.add(user.boardCards.get(user.boardCards.size() - 1));
+        }
+        cards.addAll(this.model.table.playCards);
+
+        return cards;
+    }
+
     private void initPlayCardMovement(final Card card) {
         card.toFront();
-        card.setDrawable(this.model.skin, card.face);
+        card.showFace();
         Tween.to(card, GameObject.POSITION_XY, GameConstants.CARD_SPEED).
                 target(GameConstants.PLAY_CARD_X, GameConstants.PLAY_CARD_Y).
                 start(this.tweenManager).
+                setCallbackTriggers(TweenCallback.COMPLETE).
                 setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
-                        if (type != COMPLETE) return;
-
                         if (combinedCards.isEmpty()) {
                             moveCardToTable(card, new TweenCallback() {
                                 @Override
@@ -64,14 +87,7 @@ public class OpponentHandler extends GameObjectHandler {
                                     model.currentPlayer.playCards.remove(card);
                                     model.table.playCards.add(card);
                                     if (PlayerUtil.wasLastTurn(model)) {
-                                        ActorHelper.takeTableCards(model, tweenManager, new TweenCallback() {
-                                            @Override
-                                            public void onEvent(int type, BaseTween<?> source) {
-                                                ((User)(model.currentPlayer)).boardCards.addAll(model.table.playCards);
-                                                model.table.playCards.clear();
-                                                setNextState();
-                                            }
-                                        });
+                                        takeLastTrick(model.table.playCards.remove(0));
                                     } else {
                                         setNextState();
                                     }
@@ -82,6 +98,29 @@ public class OpponentHandler extends GameObjectHandler {
                         }
                     }
                 });
+    }
+
+    private void takeLastTrick(final Card card) {
+        card.toFront();
+        Point destination = PositionCalculator.calcTrick(this.model.currentPlayer.cardPosition, this.model.opponents.size);
+        Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
+                target(destination.x, destination.y, 0).
+                setCallbackTriggers(TweenCallback.COMPLETE).
+                setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        card.showBack();
+                        ((User) model.currentPlayer).tricks.add(card);
+                        ActorHelper.takeTableCards(model, tweenManager, new TweenCallback() {
+                            @Override
+                            public void onEvent(int type, BaseTween<?> source) {
+                                setNextState();
+                            }
+                        });
+                        removeStageListeners();
+                    }
+                }).
+                start(this.tweenManager);
     }
 
     private void markCombinedCards() {
@@ -186,8 +225,6 @@ public class OpponentHandler extends GameObjectHandler {
             ActorHelper.takeTableCards(this.model, this.tweenManager, new TweenCallback() {
                 @Override
                 public void onEvent(int type, BaseTween<?> source) {
-                    ((User)(model.currentPlayer)).boardCards.addAll(model.table.playCards);
-                    model.table.playCards.clear();
                     setNextState();
                 }
             });
@@ -337,29 +374,5 @@ public class OpponentHandler extends GameObjectHandler {
                     }
                 }).
                 delay(0.3f);
-    }
-
-    private void choosePlayCard() {
-        List<Card> playCardHeap = getPlayCardHeap();
-        CardCombination bestCombination = this.cardCombinator.calculateAndChooseCombination(playCardHeap,
-                this.model.currentPlayer.playCards, this.model.table);
-        this.playCard = bestCombination.card;
-        this.combinedCards = bestCombination.combination;
-        this.model.currentPlayer.playCards.remove(bestCombination.card);
-    }
-
-    private List<Card> getPlayCardHeap() {
-        List<Card> cards = new ArrayList<>();
-
-        for (CardHolder cardHolder : this.model.cardHolders) {
-            if (cardHolder == this.model.currentPlayer) continue;
-
-            User user = (User) cardHolder;
-            if (user.boardCards.isEmpty()) continue;
-            cards.add(user.boardCards.get(user.boardCards.size() - 1));
-        }
-        cards.addAll(this.model.table.playCards);
-
-        return cards;
     }
 }
