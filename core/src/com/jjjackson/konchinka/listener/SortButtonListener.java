@@ -59,9 +59,7 @@ public class SortButtonListener extends MoveCardsButtonListener {
         tweenInfo.tweenCallback = new TweenCallback() {
             @Override
             public void onEvent(int type, BaseTween<?> source) {
-                if (!sortCards.isEmpty()) {
-                    objectMover.changeCenterCardsPosition(sortCards, false, true);
-                } else {
+                if (sortCards.isEmpty()) {
                     endSorting();
                 }
             }
