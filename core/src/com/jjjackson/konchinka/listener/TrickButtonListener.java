@@ -1,9 +1,7 @@
 package com.jjjackson.konchinka.listener;
 
 import aurelienribon.tweenengine.BaseTween;
-import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
-import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -12,24 +10,24 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.GameModel;
-import com.jjjackson.konchinka.domain.GameObject;
 import com.jjjackson.konchinka.domain.User;
-import com.jjjackson.konchinka.util.CardMover;
+import com.jjjackson.konchinka.objectmover.ObjectMover;
+import com.jjjackson.konchinka.objectmover.TweenInfo;
 
 public class TrickButtonListener extends MoveCardsButtonListener {
 
-    public TrickButtonListener(GameModel model, TweenManager tweenManager, CardMover cardMover, TextButton button) {
-        super(cardMover, model, tweenManager, button);
+    public TrickButtonListener(GameModel model, ObjectMover objectMover, TextButton button) {
+        super(objectMover, model, button);
     }
 
     @Override
     protected void disableOtherButtons() {
-        this.model.buttons.sortButton.setTouchable(Touchable.disabled);
+        model.buttons.sortButton.setTouchable(Touchable.disabled);
     }
 
     @Override
     protected void enableOtherButtons() {
-        this.model.buttons.sortButton.setTouchable(Touchable.enabled);
+        model.buttons.sortButton.setTouchable(Touchable.enabled);
     }
 
     @Override
@@ -57,18 +55,23 @@ public class TrickButtonListener extends MoveCardsButtonListener {
     }
 
     private void initMovement(final Card card) {
-        this.cardMover.showOnCardsLayer(card);
+        objectMover.showOnCardsLayer(card);
         card.toFront();
-        Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                target(GameConstants.TRICK_BOTTOM_X, GameConstants.TRICK_BOTTOM_Y, 0).
-                setCallbackTriggers(TweenCallback.COMPLETE).
-                setCallback(new TweenCallback() {
-                    @Override
-                    public void onEvent(int type, BaseTween<?> source) {
-                        card.showBack();
-                        moveSortedCards();
-                    }
-                }).start(this.tweenManager);
+
+        TweenInfo tweenInfo = card.tweenInfo;
+        tweenInfo.x = GameConstants.TRICK_BOTTOM_X;
+        tweenInfo.y = GameConstants.TRICK_BOTTOM_Y;
+        tweenInfo.angle = GameConstants.ANGLE_VERTICAL;
+        tweenInfo.speed = GameConstants.CARD_SPEED;
+        tweenInfo.tweenCallback = new TweenCallback() {
+            @Override
+            public void onEvent(int type, BaseTween<?> source) {
+                card.showBack();
+                moveSortedCards();
+            }
+        };
+
+        objectMover.move(card);
     }
 
 }

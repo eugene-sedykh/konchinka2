@@ -1,12 +1,14 @@
 package com.jjjackson.konchinka.util;
 
-import aurelienribon.tweenengine.*;
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.TweenCallback;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
-import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.objectmover.ObjectMover;
+import com.jjjackson.konchinka.objectmover.TweenInfo;
 
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class ActorHelper {
         }
     }
 
-    public static void takeTableCards(final GameModel model, TweenManager tweenManager, final TweenCallback callback) {
+    public static void takeTableCards(final GameModel model, ObjectMover objectMover, final TweenCallback callback) {
         TweenCallback tweenCallback = new TweenCallback() {
             @Override
             public void onEvent(int type, BaseTween<?> source) {
@@ -47,20 +49,22 @@ public class ActorHelper {
                 callback.onEvent(type, source);
             }
         };
-        Timeline timeline = Timeline.createSequence();
         for (Card card : model.table.playCards) {
-            timeline.push(createCardTween(card, model.currentPlayer.cardPosition, model.opponents.size));
+            initCardTween(card, model.currentPlayer.cardPosition, model.opponents.size);
         }
-        timeline.setCallbackTriggers(TweenCallback.COMPLETE).
-                setCallback(tweenCallback).
-                start(tweenManager);
+        objectMover.move(model.table.playCards, true, tweenCallback);
     }
 
-    private static Tween createCardTween(Card card, CardPosition cardPosition, int opponentsNumber) {
+    private static void initCardTween(Card card, CardPosition cardPosition, int opponentsNumber) {
         card.toFront();
         Point destination = PositionCalculator.calcBoard(cardPosition, opponentsNumber);
         int rotation = PositionCalculator.calcRotation(cardPosition);
-        return Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                target(destination.x, destination.y, rotation).delay(0.3f);
+
+        TweenInfo tweenInfo = card.tweenInfo;
+        tweenInfo.x = destination.x;
+        tweenInfo.y = destination.y;
+        tweenInfo.angle = rotation;
+        tweenInfo.tweenCallback = null;
+        tweenInfo.delay = 0.3f;
     }
 }

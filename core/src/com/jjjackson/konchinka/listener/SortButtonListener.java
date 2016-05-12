@@ -1,9 +1,7 @@
 package com.jjjackson.konchinka.listener;
 
 import aurelienribon.tweenengine.BaseTween;
-import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
-import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -11,25 +9,25 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.jjjackson.konchinka.GameConstants;
 import com.jjjackson.konchinka.domain.Card;
 import com.jjjackson.konchinka.domain.GameModel;
-import com.jjjackson.konchinka.domain.GameObject;
-import com.jjjackson.konchinka.util.CardMover;
+import com.jjjackson.konchinka.objectmover.ObjectMover;
+import com.jjjackson.konchinka.objectmover.TweenInfo;
 
 public class SortButtonListener extends MoveCardsButtonListener {
 
-    public SortButtonListener(GameModel model, TweenManager tweenManager, CardMover cardMover, TextButton button) {
-        super(cardMover, model, tweenManager, button);
+    public SortButtonListener(GameModel model, ObjectMover objectMover, TextButton button) {
+        super(objectMover, model, button);
     }
 
     @Override
     protected void disableOtherButtons() {
-        this.model.buttons.trickButton.setTouchable(Touchable.disabled);
-        this.model.buttons.endButton.setTouchable(Touchable.disabled);
+        model.buttons.trickButton.setTouchable(Touchable.disabled);
+        model.buttons.endButton.setTouchable(Touchable.disabled);
     }
 
     @Override
     protected void enableOtherButtons() {
-        this.model.buttons.trickButton.setTouchable(Touchable.enabled);
-        this.model.buttons.endButton.setTouchable(Touchable.enabled);
+        model.buttons.trickButton.setTouchable(Touchable.enabled);
+        model.buttons.endButton.setTouchable(Touchable.enabled);
     }
 
     @Override
@@ -45,26 +43,31 @@ public class SortButtonListener extends MoveCardsButtonListener {
     private void moveCardToPlayer(Card card) {
         card.getListeners().clear();
         initMovement(card);
-        this.model.turnCombinedCards.add(card);
-        this.sortCards.remove(card);
+        model.turnCombinedCards.add(card);
+        sortCards.remove(card);
     }
 
     private void initMovement(Card card) {
-        this.cardMover.showOnCardsLayer(card);
+        objectMover.showOnCardsLayer(card);
         card.toFront();
-        Tween.to(card, GameObject.ROTATION_XY, GameConstants.CARD_SPEED).
-                target(GameConstants.BOARD_BOTTOM_X, GameConstants.BOARD_BOTTOM_Y, 90).
-                setCallbackTriggers(TweenCallback.COMPLETE).
-                setCallback(new TweenCallback() {
-                    @Override
-                    public void onEvent(int type, BaseTween<?> source) {
-                        if (!sortCards.isEmpty()) {
-                            cardMover.changeCenterCardsPosition(sortCards, false, true);
-                        } else {
-                            endSorting();
-                        }
-                    }
-                }).start(this.tweenManager);
+
+        TweenInfo tweenInfo = card.tweenInfo;
+        tweenInfo.x = GameConstants.BOARD_BOTTOM_X;
+        tweenInfo.y = GameConstants.BOARD_BOTTOM_Y;
+        tweenInfo.angle = GameConstants.ANGLE_HORIZONTAL;
+        tweenInfo.speed = GameConstants.CARD_SPEED;
+        tweenInfo.tweenCallback = new TweenCallback() {
+            @Override
+            public void onEvent(int type, BaseTween<?> source) {
+                if (!sortCards.isEmpty()) {
+                    objectMover.changeCenterCardsPosition(sortCards, false, true);
+                } else {
+                    endSorting();
+                }
+            }
+        };
+
+        objectMover.move(card);
     }
 
 }

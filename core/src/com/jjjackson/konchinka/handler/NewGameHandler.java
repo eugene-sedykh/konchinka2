@@ -1,14 +1,17 @@
 package com.jjjackson.konchinka.handler;
 
 import aurelienribon.tweenengine.BaseTween;
-import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.TweenCallback;
-import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.jjjackson.konchinka.GameConstants;
-import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.domain.Card;
+import com.jjjackson.konchinka.domain.GameModel;
+import com.jjjackson.konchinka.domain.User;
+import com.jjjackson.konchinka.domain.UserAvatar;
 import com.jjjackson.konchinka.domain.state.GameState;
 import com.jjjackson.konchinka.domain.state.NewGameState;
+import com.jjjackson.konchinka.objectmover.ObjectMover;
+import com.jjjackson.konchinka.objectmover.TweenInfo;
 import com.jjjackson.konchinka.util.ActorHelper;
 import com.jjjackson.konchinka.util.PlayerUtil;
 
@@ -16,16 +19,16 @@ import java.util.Collections;
 import java.util.List;
 
 public class NewGameHandler extends GameObjectHandler {
-    public NewGameHandler(GameModel model, TweenManager tweenManager) {
-        super(model, tweenManager);
+    public NewGameHandler(GameModel model, ObjectMover objectMover) {
+        super(model, objectMover);
     }
 
     @Override
     public void handle() {
-        switch (this.model.states.newGame) {
+        switch (model.states.newGame) {
             case INIT:
                 prepare();
-                this.model.states.newGame = NewGameState.WAIT;
+                model.states.newGame = NewGameState.WAIT;
                 break;
             case WAIT:
                 break;
@@ -40,7 +43,7 @@ public class NewGameHandler extends GameObjectHandler {
     }
 
     private void reloadTurnCount() {
-        this.model.turnCount = 1;
+        model.turnCount = 1;
     }
 
     private void addTableToCardHolders() {
@@ -49,63 +52,73 @@ public class NewGameHandler extends GameObjectHandler {
     }
 
     private void hideResultsLayer() {
-        Group resultLayer = ActorHelper.getLayerByName(this.model.stage.getActors(), GameConstants.RESULT_LAYER_NAME);
+        Group resultLayer = ActorHelper.getLayerByName(model.stage.getActors(), GameConstants.RESULT_LAYER_NAME);
         resultLayer.clearChildren();
     }
 
     private void moveAvatarsBack() {
-        Timeline timeline = Timeline.createParallel();
-        for (UserAvatar userAvatar : getAvatars()) {
-            timeline.push(createAvatarTween(userAvatar, new Point(userAvatar.getAvatarX(), userAvatar.getAvatarY())));
+
+        List<UserAvatar> avatars = getAvatars();
+        for (UserAvatar avatar : avatars) {
+            TweenInfo tweenInfo = avatar.tweenInfo;
+            tweenInfo.x = avatar.getAvatarX();
+            tweenInfo.y = avatar.getAvatarY();
         }
-        timeline.setCallbackTriggers(TweenCallback.COMPLETE)
-                .setCallback(new TweenCallback() {
-                    @Override
-                    public void onEvent(int i, BaseTween<?> baseTween) {
-                        preparePack();
-                        showCardsLayer();
-                        model.states.game = GameState.DEAL;
-                        model.states.newGame = NewGameState.INIT;
-                    }
-                })
-                .start(this.tweenManager);
+
+        objectMover.move(avatars, false, new TweenCallback() {
+            @Override
+            public void onEvent(int i, BaseTween<?> baseTween) {
+                preparePack();
+                showCardsLayer();
+                model.states.game = GameState.DEAL;
+                model.states.newGame = NewGameState.INIT;
+            }
+        });
     }
 
     private void preparePack() {
         gatherCardsAndShuffle();
         moveCardsToPack();
-        this.model.pack.refreshTexture();
+        model.pack.refreshTexture();
     }
 
     private void moveCardsToPack() {
-        for (Card card : this.model.pack.cards) {
-            card.setX(this.model.pack.getX());
-            card.setY(this.model.pack.getY());
+        for (Card card : model.pack.cards) {
+            card.setX(model.pack.getX());
+            card.setY(model.pack.getY());
             card.setRotation(0);
+            card.tweenInfo.delay = 0;
+            card.tweenInfo.angle = 0;
+            card.tweenInfo.speed = 0;
+            card.tweenInfo.x = 0;
+            card.tweenInfo.y = 0;
+            card.tweenInfo.tweenCallback = null;
             card.showBack();
         }
     }
 
     private void showCardsLayer() {
-        Group bottomLayer = ActorHelper.getLayerByName(this.model.stage.getActors(), GameConstants.BOTTOM_LAYER_NAME);
+        Group bottomLayer = ActorHelper.getLayerByName(model.stage.getActors(), GameConstants.BOTTOM_LAYER_NAME);
         bottomLayer.setVisible(true);
     }
 
     private void gatherCardsAndShuffle() {
-        getFromUser(this.model.pack.cards, model.player);
+        getFromUser(model.pack.cards, model.player);
 
         for (User opponent : model.opponents) {
-            getFromUser(this.model.pack.cards, opponent);
+            getFromUser(model.pack.cards, opponent);
         }
 
-        Collections.shuffle(this.model.pack.cards);
+        Collections.shuffle(model.pack.cards);
     }
 
     private void getFromUser(List<Card> cards, User user) {
         cards.addAll(user.boardCards);
         cards.addAll(user.tricks);
+        cards.addAll(user.playCards);
 
         user.boardCards.clear();
         user.tricks.clear();
+        user.playCards.clear();
     }
 }

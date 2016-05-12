@@ -66,6 +66,7 @@ public class GameConstants {
     public static final float DEALING_SPEED = 0.2f;
 
     public static final float PLAY_CARD_TO_TABLE_DELAY = 0.5f;
+    public static final float OPPONENT_DELAY = 0.3f;
 
     public static final String BOTTOM_LAYER_NAME = "bottom";
     public static final String TOP_LAYER_NAME = "top";
@@ -89,4 +90,7 @@ public class GameConstants {
     public static final float PACK_SPEED = 0.4f;
 
     public static final int PLAY_CARDS_NUMBER = 4;
+
+    public static final float ANGLE_VERTICAL = 0;
+    public static final float ANGLE_HORIZONTAL = 90;
 }

@@ -4,6 +4,7 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.handler.GameObjectHandlerFactory;
+import com.jjjackson.konchinka.objectmover.ObjectMover;
 
 public class GameController {
     public GameModel model;
@@ -14,12 +15,13 @@ public class GameController {
         this.model = gameModel;
         this.tweenManager = new TweenManager();
         Tween.setCombinedAttributesLimit(4);
-        this.handlerFactory = new GameObjectHandlerFactory(this.model, this.tweenManager);
+        ObjectMover objectMover = new ObjectMover(model.stage, tweenManager);
+        handlerFactory = new GameObjectHandlerFactory(model, objectMover);
     }
 
     public void update(float delta) {
-        this.handlerFactory.get(this.model.states.game).handle();
+        handlerFactory.get(model.states.game).handle();
 
-        this.tweenManager.update(delta);
+        tweenManager.update(delta);
     }
 }

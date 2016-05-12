@@ -1,8 +1,8 @@
 package com.jjjackson.konchinka.handler;
 
-import aurelienribon.tweenengine.TweenManager;
 import com.jjjackson.konchinka.domain.GameModel;
 import com.jjjackson.konchinka.domain.state.GameState;
+import com.jjjackson.konchinka.objectmover.ObjectMover;
 
 public class GameObjectHandlerFactory {
 
@@ -14,28 +14,28 @@ public class GameObjectHandlerFactory {
     private final GameObjectHandler resultHandler;
     private final GameObjectHandler newGameHandler;
 
-    public GameObjectHandlerFactory(GameModel model, TweenManager tweenManager) {
+    public GameObjectHandlerFactory(GameModel model, ObjectMover objectMover) {
         this.model = model;
-        this.packHandler = new PackHandler(model, tweenManager);
-        this.playerHandler = new PlayerHandler(model, tweenManager);
-        this.nextTurnHandler = new NextTurnHandler(model, tweenManager);
-        this.opponentHandler = new OpponentHandler(model, tweenManager);
-        this.resultHandler = new ResultHandler(model, tweenManager);
-        this.newGameHandler = new NewGameHandler(model, tweenManager);
+        packHandler = new PackHandler(model, objectMover);
+        playerHandler = new PlayerHandler(model, objectMover);
+        nextTurnHandler = new NextTurnHandler(model, objectMover);
+        opponentHandler = new OpponentHandler(model, objectMover);
+        resultHandler = new ResultHandler(model, objectMover);
+        newGameHandler = new NewGameHandler(model, objectMover);
     }
 
     public GameObjectHandler get(GameState gameState) {
         switch (gameState) {
             case DEAL:
-                return this.packHandler;
+                return packHandler;
             case NEXT_TURN:
-                return this.nextTurnHandler;
+                return nextTurnHandler;
             case TURN:
-                return this.model.currentPlayer == this.model.player ? this.playerHandler : this.opponentHandler;
+                return model.currentPlayer == model.player ? playerHandler : opponentHandler;
             case GAME_RESULT:
-                return this.resultHandler;
+                return resultHandler;
             case NEW_GAME:
-                return this.newGameHandler;
+                return newGameHandler;
             default:
                 throw new AssertionError("Cannot find handler for game state: " + gameState);
         }

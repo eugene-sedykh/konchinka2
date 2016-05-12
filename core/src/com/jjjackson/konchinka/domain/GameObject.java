@@ -4,12 +4,16 @@ import aurelienribon.tweenengine.TweenAccessor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.jjjackson.konchinka.objectmover.TweenInfo;
 
 public abstract class GameObject extends Image implements TweenAccessor<GameObject> {
 
     public static final int POSITION_XY = 1;
     public static final int ROTATION_XY = 2;
     public static final int COLOR = 3;
+
+    public TweenInfo tweenInfo = new TweenInfo();
+
     protected Skin skin;
 
     public GameObject(Skin skin, String drawableName) {

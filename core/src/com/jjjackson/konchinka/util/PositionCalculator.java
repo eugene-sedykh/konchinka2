@@ -7,6 +7,7 @@ import com.jjjackson.konchinka.domain.Point;
 public class PositionCalculator {
 
     public static final int THREE_OPPONENTS = 3;
+    public static final int CARD_WIDTH = GameConstants.CARD_WIDTH + GameConstants.TABLE_CARDS_GAP;
 
     public static void calcTop(int cardNumber, Point destination) {
         destination.x = 25 + cardNumber * (GameConstants.CARD_WIDTH + 20);
@@ -28,10 +29,23 @@ public class PositionCalculator {
         destination.y = GameConstants.PLAY_CARD_RIGHT_Y - cardNumber * 25 - getShift(opponentsNumber);
     }
 
+    public static void calcCenter(int index, int total, Point destination) {
+        int row = index / 4;
+        boolean isLastRow = row == total / 4;
+        int rowWidth = (isLastRow ? total % 4 : 4) * CARD_WIDTH;
+        int indexInRow = index % 4;
+        destination.x = (GameConstants.SCREEN_WIDTH - rowWidth) / 2 + indexInRow * CARD_WIDTH;
+        calcCenterY(index, destination, true);
+    }
+
     public static void calcCenter(int cardNumber, Point destination, boolean shiftVertically) {
         int cardsInRow = cardNumber % 4;
         destination.x = 240 - (cardsInRow + 1) * (GameConstants.CARD_WIDTH + GameConstants.TABLE_CARDS_GAP) / 2 +
                 (cardsInRow) * (GameConstants.CARD_WIDTH + GameConstants.TABLE_CARDS_GAP);
+        calcCenterY(cardNumber, destination, shiftVertically);
+    }
+
+    private static void calcCenterY(int cardNumber, Point destination, boolean shiftVertically) {
         destination.y = 475 - (cardNumber / 4 * (GameConstants.CARD_HEIGHT + GameConstants.TABLE_CARDS_GAP));
         if (shiftVertically) {
             destination.y = (destination.y - (GameConstants.CARD_HEIGHT + GameConstants.TABLE_CARDS_GAP) / 2);
