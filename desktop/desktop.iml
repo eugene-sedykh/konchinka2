@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id=":desktop" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="konchinka2" external.system.module.version="1.0" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
-    <facet type="android-gradle" name="Android-Gradle">
-      <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":desktop" />
-      </configuration>
-    </facet>
     <facet type="java-gradle" name="Java-Gradle">
       <configuration>
         <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/build" />
         <option name="BUILDABLE" value="true" />
+      </configuration>
+    </facet>
+    <facet type="android" name="Android">
+      <configuration>
+        <option name="MANIFEST_FILE_RELATIVE_PATH" value="/../android/AndroidManifest.xml" />
+        <option name="RES_FOLDER_RELATIVE_PATH" value="/../android/res" />
+        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/../android/assets" />
+        <option name="LIBS_FOLDER_RELATIVE_PATH" value="/../android/libs" />
       </configuration>
     </facet>
   </component>
@@ -22,6 +25,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>

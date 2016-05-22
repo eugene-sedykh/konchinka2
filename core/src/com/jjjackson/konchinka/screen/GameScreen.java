@@ -1,8 +1,10 @@
 package com.jjjackson.konchinka.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
@@ -11,6 +13,7 @@ import com.jjjackson.konchinka.GameController;
 import com.jjjackson.konchinka.GameRenderer;
 import com.jjjackson.konchinka.KonchinkaGame;
 import com.jjjackson.konchinka.domain.*;
+import com.jjjackson.konchinka.inputadapter.PauseInputProcessor;
 import com.jjjackson.konchinka.util.PlayerUtil;
 
 import java.util.ArrayList;
@@ -20,7 +23,6 @@ import java.util.Random;
 
 public class GameScreen implements Screen {
 
-    private KonchinkaGame konchinkaGame;
     private GameController gameController;
     private GameRenderer gameRenderer;
     private Stage stage;
@@ -28,18 +30,26 @@ public class GameScreen implements Screen {
 
     private List<UserAvatar> cpuAvatars = new ArrayList<>();
     private UserAvatar userAvatar;
+    private final GameModel gameModel;
 
     public GameScreen(KonchinkaGame konchinkaGame) {
-        this.konchinkaGame = konchinkaGame;
         this.stage = new Stage();
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
         this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/cards.pack")));
         this.skin.addRegions(new TextureAtlas(Gdx.files.internal("img/avatars/avatars.pack")));
-        GameModel gameModel = initModel();
+        gameModel = initModel();
+        gameModel.game = konchinkaGame;
+        gameModel.actors = getInteractiveObjects(gameModel);
         gameModel.skin = this.skin;
         gameModel.stage = this.stage;
         this.gameRenderer = new GameRenderer(gameModel, this.stage, this.skin);
         this.gameController = new GameController(gameModel);
+    }
+
+    private List<Actor> getInteractiveObjects(GameModel gameModel) {
+        List<Actor> actors = new ArrayList<>();
+        actors.addAll(gameModel.pack.cards);
+        return actors;
     }
 
     private GameModel initModel() {
@@ -123,7 +133,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(this.stage);
+        Gdx.input.setInputProcessor(new InputMultiplexer(stage, new PauseInputProcessor(gameModel)));
     }
 
     @Override

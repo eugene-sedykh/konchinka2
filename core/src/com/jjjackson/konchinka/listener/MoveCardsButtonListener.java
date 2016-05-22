@@ -88,6 +88,7 @@ public abstract class MoveCardsButtonListener extends ClickListener {
     }
 
     protected void moveSortedCards() {
+        button.setTouchable(Touchable.disabled);
         for (Card card : sortCards) {
             card.getListeners().clear();
             initBackToPlayerTween(card);
@@ -101,6 +102,7 @@ public abstract class MoveCardsButtonListener extends ClickListener {
                 objectMover.showOnCardsLayer(sortCards);
                 sortCards.clear();
                 endSorting();
+                button.setTouchable(Touchable.enabled);
             }
         });
     }

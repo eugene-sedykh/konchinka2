@@ -23,11 +23,13 @@ public class TrickButtonListener extends MoveCardsButtonListener {
     @Override
     protected void disableOtherButtons() {
         model.buttons.sortButton.setTouchable(Touchable.disabled);
+        model.buttons.endButton.setTouchable(Touchable.disabled);
     }
 
     @Override
     protected void enableOtherButtons() {
         model.buttons.sortButton.setTouchable(Touchable.enabled);
+        model.buttons.endButton.setTouchable(Touchable.enabled);
     }
 
     @Override

@@ -13,6 +13,7 @@ public class GameObjectHandlerFactory {
     private final GameObjectHandler opponentHandler;
     private final GameObjectHandler resultHandler;
     private final GameObjectHandler newGameHandler;
+    private final GameObjectHandler pauseHandler;
 
     public GameObjectHandlerFactory(GameModel model, ObjectMover objectMover) {
         this.model = model;
@@ -22,6 +23,7 @@ public class GameObjectHandlerFactory {
         opponentHandler = new OpponentHandler(model, objectMover);
         resultHandler = new ResultHandler(model, objectMover);
         newGameHandler = new NewGameHandler(model, objectMover);
+        pauseHandler = new PauseHandler(model, objectMover);
     }
 
     public GameObjectHandler get(GameState gameState) {
@@ -36,6 +38,8 @@ public class GameObjectHandlerFactory {
                 return resultHandler;
             case NEW_GAME:
                 return newGameHandler;
+            case PAUSE:
+                return pauseHandler;
             default:
                 throw new AssertionError("Cannot find handler for game state: " + gameState);
         }
