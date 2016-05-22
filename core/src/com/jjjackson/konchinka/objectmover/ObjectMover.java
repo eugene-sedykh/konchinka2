@@ -22,6 +22,10 @@ public class ObjectMover {
         this.cardsLayer = ActorHelper.getLayerByName(stage.getActors(), GameConstants.BOTTOM_LAYER_NAME);
     }
 
+    public TweenManager getTweenManager() {
+        return tweenManager;
+    }
+
     public void changeCenterCardsPosition(List<Card> cards, boolean addPlaceholder) {
         changeCenterCardsPosition(cards, addPlaceholder, false);
     }

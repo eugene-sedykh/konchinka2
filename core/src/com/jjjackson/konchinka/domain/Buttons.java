@@ -9,4 +9,7 @@ public class Buttons {
     public TextButton endButton;
     public TextButton mainMenuButton;
     public TextButton newGameButton;
+    public TextButton pauseContinue;
+    public TextButton pauseMainMenu;
+    public TextButton pauseExit;
 }

@@ -12,14 +12,15 @@ public class KonchinkaGame extends Game {
 
     @Override
     public void create() {
-        this.mainMenuScreen = new MainMenuScreen(this);
-        this.gameScreen = new GameScreen(this);
-        setScreen(this.mainMenuScreen);
+        Gdx.input.setCatchBackKey(true);
+        mainMenuScreen = new MainMenuScreen(this);
+        gameScreen = new GameScreen(this);
+        setScreen(mainMenuScreen);
     }
 
     @Override
     public void dispose() {
-        this.gameScreen.dispose();
+        gameScreen.dispose();
         Gdx.app.exit();
     }
 }

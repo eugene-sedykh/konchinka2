@@ -5,5 +5,6 @@ public enum GameState {
     NEXT_TURN,
     GAME_RESULT,
     NEW_GAME,
+    PAUSE,
     TURN
 }

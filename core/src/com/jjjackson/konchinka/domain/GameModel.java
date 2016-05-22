@@ -1,9 +1,11 @@
 package com.jjjackson.konchinka.domain;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.jjjackson.konchinka.KonchinkaGame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ public class GameModel {
     public CardPosition dealerPosition;
     public Buttons buttons = new Buttons();
     public Fog fog;
+    public Fog pauseFog;
     public Card playCard;
     public List<Card> turnCombinedCards = new ArrayList<>();
     public boolean isTrickTaken;
@@ -26,4 +29,6 @@ public class GameModel {
     public Stage stage;
     public int turnCount = 1;
     public BitmapFont font;
+    public List<Actor> actors;
+    public KonchinkaGame game;
 }

@@ -52,13 +52,14 @@ public class GameRenderer {
 
         initGameButtons(firstGroup, font);
         initSortFog(secondGroup);
+        initPauseFog(secondGroup);
         initAvatars(secondGroup);
     }
 
     private BitmapFont loadFont() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("font/42759.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.characters = "НоваяИгрГленМюСтиьВзкКцхд";
+        parameter.characters = "НоваяИгрГленМюСтиьВзкКцхдПжЗшу";
         parameter.size = 20;
         BitmapFont font = generator.generateFont(parameter);
 
@@ -77,9 +78,16 @@ public class GameRenderer {
     }
 
     private void initSortFog(Group fogLayer) {
-        Fog fog = new Fog();
+        Fog fog = new Fog(0.3f);
         fog.setVisible(false);
         this.model.fog = fog;
+        fogLayer.addActor(fog);
+    }
+
+    private void initPauseFog(Group fogLayer) {
+        Fog fog = new Fog(0.8f);
+        fog.setVisible(false);
+        this.model.pauseFog = fog;
         fogLayer.addActor(fog);
     }
 
@@ -91,18 +99,28 @@ public class GameRenderer {
         TextButton endButton = createButton("Конец хода", textButtonStyle, 380, 150);
         TextButton mainMenuButton = createButton("Главное Меню", textButtonStyle, 80, 50);
         TextButton newGameButton = createButton("Новая Игра", textButtonStyle, 240, 50);
+        TextButton pauseContinueButton = createButton("Продолжить", textButtonStyle, 180, 600);
+        TextButton pauseMainMenuButton = createButton("Главное Меню", textButtonStyle, 180, 500);
+        TextButton pauseExitButton = createButton("Завершить Игру", textButtonStyle, 180, 400);
         stage.addActor(sortButton);
         stage.addActor(endSortButton);
         stage.addActor(trickButton);
         stage.addActor(endButton);
-        this.model.buttons.sortButton = sortButton;
-        this.model.buttons.endSortButton = endSortButton;
-        this.model.buttons.trickButton = trickButton;
-        this.model.buttons.endButton = endButton;
-        this.model.buttons.mainMenuButton = mainMenuButton;
-        this.model.buttons.newGameButton = newGameButton;
+        model.buttons.sortButton = sortButton;
+        model.buttons.endSortButton = endSortButton;
+        model.buttons.trickButton = trickButton;
+        model.buttons.endButton = endButton;
+        model.buttons.mainMenuButton = mainMenuButton;
+        model.buttons.newGameButton = newGameButton;
+        model.buttons.pauseContinue = pauseContinueButton;
+        model.buttons.pauseMainMenu = pauseMainMenuButton;
+        model.buttons.pauseExit = pauseExitButton;
+
         mainMenuButton.setVisible(true);
         newGameButton.setVisible(true);
+        pauseContinueButton.setVisible(true);
+        pauseMainMenuButton.setVisible(true);
+        pauseExitButton.setVisible(true);
     }
 
     private TextButton.TextButtonStyle createButtonStyle(BitmapFont font) {
@@ -127,8 +145,6 @@ public class GameRenderer {
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glClearColor((float) 56 / 255, (float) 178 / 255, (float) 51 / 255, 1);
-//        Gdx.gl.glClearColor((float)176/255, (float)245/255, (float)103/255, 1);
-//        Gdx.gl.glClearColor((float)205/255, (float)247/255, (float)203/255, 1);
 
         this.stage.act(delta);
         this.stage.draw();
